@@ -1,18 +1,15 @@
-// src/layouts/MainLayout.tsx
-import { type ReactNode } from "react"
-import Sidebar from "../components/Sidebar"
+import { type ReactNode } from "react";
 
 type Props = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
 const MainLayout = ({ children }: Props) => {
   return (
-    <div className="min-h-screen flex bg-gray-100 dark:bg-black text-gray-800 dark:text-white">
-      <Sidebar />
-      <main className="flex-1 p-4">{children}</main>
+    <div className="w-full min-h-screen bg-[#d5eafd] flex items-center justify-center overflow-x-hidden">
+      <main className="w-full">{children}</main>
     </div>
   )
 }
 
-export default MainLayout
+export default MainLayout;
