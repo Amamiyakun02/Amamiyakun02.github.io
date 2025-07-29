@@ -1,12 +1,28 @@
 import { Link } from "react-router-dom"
 import { Home as HomeIcon, User, Briefcase, Bot, Mail, Phone, Instagram, Facebook, Github, Linkedin, MessageSquare } from "lucide-react"
 import avatar from "../assets/images/profile.jpg"
+import AssistantButton from "../components/AssistantButton"
 
 const Home = () => {
   return (
     <div className="min-h-screen bg-[#d5eafd] flex flex-col items-center justify-center px-4 relative overflow-x-hidden isolate">
+
       {/* Kontainer utama */}
-      <div className="relative flex w-full max-w-screen-2xl bg-slate-50 rounded-[25px] shadow-2xl shadow-black/30 overflow-visible min-h-[800px]">
+        <div className="relative flex w-full max-w-screen-2xl bg-slate-50 rounded-[25px] overflow-visible min-h-[800px] shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
+        {/* Tombol Panah Kiri */}
+            <button className="absolute left-[-40px] top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 shadow-md hover:bg-blue-100 transition z-30">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M15 18l-6-6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            </button>
+
+            {/* Tombol Panah Kanan */}
+            <button className="absolute right-[-40px] top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 shadow-md hover:bg-blue-100 transition z-30">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            </button>
+
         {/* Sidebar */}
         <div className="w-[300px] bg-slate-800 rounded-[25px] p-6 flex flex-col items-center">
           <img
@@ -39,11 +55,16 @@ const Home = () => {
           </div>
 
           {/* Kontak */}
-          <p className="text-white text-xs text-center mt-4 px-2">
+            <p className="text-white text-xs text-center mt-4 px-2">
             <Phone size={14} className="inline mr-2" />
             +6283863450720 or talk directly to my{" "}
-            <span className="italic underline">AI Assistant</span>.
-          </p>
+            <a
+                href="https://amamiyakun02.github.io/PersonalAssistant"
+                className="italic underline hover:text-blue-300 transition"
+            >
+                AI Assistant
+            </a>.
+            </p>
         </div>
 
         {/* Konten Tengah */}
@@ -76,6 +97,9 @@ const Home = () => {
             </button>
           </div>
         </div>
+
+        {/* Tombol Assistant di pojok kanan bawah kontainer */}
+        <AssistantButton />
       </div>
 
 {/* Tombol Navigasi (di luar konten, menempel layar bawah) */}
