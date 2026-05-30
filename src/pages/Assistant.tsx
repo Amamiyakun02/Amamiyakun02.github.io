@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Bot, Send, User, Sparkles, AlertCircle } from "lucide-react"
+import { Bot, Send, User, Sparkles } from "lucide-react"
 import { useApp } from "../context/AppContext"
 
 type Message = {
@@ -23,6 +23,90 @@ const suggestions = {
     "Bagaimana cara menghubungi Anda?"
   ]
 }
+
+
+const escapeHtml = (text: string) => {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
+const highlightCode = (code: string, lang: string): string => {
+  const escaped = escapeHtml(code);
+  const l = lang.toLowerCase().trim();
+  let highlighted = escaped;
+
+  // 1. Extract and store comments to protect them from keyword highlighting
+  const comments: string[] = [];
+  highlighted = highlighted.replace(/(\/\*[\s\S]*?\*\/|\/\/.*|#.*)/g, (match) => {
+    const id = `___COMMENT_TOKEN_${comments.length}___`;
+    comments.push(match);
+    return id;
+  });
+
+  // 2. Extract and store strings to protect them from keyword highlighting
+  const strings: string[] = [];
+  highlighted = highlighted.replace(/(&quot;[\s\S]*?&quot;|&#039;[\s\S]*?&#039;|`[\s\S]*?`)/g, (match) => {
+    const id = `___STRING_TOKEN_${strings.length}___`;
+    strings.push(match);
+    return id;
+  });
+
+  // 3. Keywords matching
+  const keywordsMap: Record<string, string[]> = {
+    python: ["def", "class", "return", "if", "else", "elif", "for", "while", "import", "from", "as", "try", "except", "with", "lambda", "in", "is", "not", "and", "or", "pass", "global", "nonlocal", "yield", "assert", "break", "continue", "del"],
+    js: ["const", "let", "var", "function", "return", "if", "else", "for", "while", "do", "import", "from", "export", "default", "class", "extends", "new", "this", "try", "catch", "finally", "async", "await", "typeof", "instanceof", "in", "of", "break", "continue", "switch", "case", "throw"],
+    ts: ["const", "let", "var", "function", "return", "if", "else", "for", "while", "do", "import", "from", "export", "default", "class", "extends", "new", "this", "try", "catch", "finally", "async", "await", "typeof", "instanceof", "in", "of", "break", "continue", "switch", "case", "throw", "interface", "type", "enum", "implements", "readonly", "namespace", "as", "keyof", "declare", "public", "private", "protected", "static", "get", "set"],
+    go: ["func", "package", "import", "return", "if", "else", "for", "range", "var", "const", "type", "struct", "interface", "map", "chan", "go", "select", "switch", "case", "default", "defer", "nil", "break", "continue", "fallthrough"],
+    php: ["function", "return", "if", "else", "elseif", "for", "foreach", "while", "class", "public", "private", "protected", "new", "this", "use", "namespace", "echo", "try", "catch", "as", "extends", "implements", "break", "continue", "switch", "case", "default"],
+    bash: ["echo", "if", "then", "else", "elif", "fi", "for", "while", "do", "done", "in", "case", "esac", "function", "return", "exit", "local", "sudo", "alias", "export", "grep", "awk", "sed", "curl", "wget", "git", "cd", "ls", "mkdir", "rm"],
+    sql: ["SELECT", "FROM", "WHERE", "INSERT", "INTO", "UPDATE", "SET", "DELETE", "JOIN", "ON", "LEFT", "RIGHT", "INNER", "OUTER", "GROUP", "BY", "ORDER", "HAVING", "LIMIT", "CREATE", "TABLE", "INDEX", "DROP", "ALTER", "AND", "OR", "IN", "NOT", "NULL", "AS", "select", "from", "where", "insert", "into", "update", "set", "delete", "join", "on", "group", "by", "order", "limit", "and", "or", "not", "null", "as", "VALUES", "values", "COUNT", "count", "SUM", "sum", "MAX", "max", "MIN", "min", "AVG", "avg"]
+  };
+
+  const defaultKeywords = ["if", "else", "for", "while", "return", "class", "import", "const", "var", "let", "function", "def", "func", "fn", "struct", "package", "type", "interface", "new", "try", "catch", "break", "continue", "switch", "case"];
+  
+  const lookupLang = l === "typescript" || l === "tsx" ? "ts" : l === "javascript" || l === "jsx" ? "js" : l === "golang" ? "go" : l === "shell" || l === "sh" ? "bash" : l;
+  const keywords = keywordsMap[lookupLang] || defaultKeywords;
+
+  // Keyword highlighting
+  const keywordRegex = new RegExp(`\\b(${keywords.join("|")})\\b`, "g");
+  highlighted = highlighted.replace(keywordRegex, '<span style="color: #ff79c6; font-weight: bold;">$1</span>');
+
+  // 4. Built-in types and values
+  const typesMap: Record<string, string[]> = {
+    python: ["str", "int", "float", "bool", "list", "dict", "tuple", "set", "True", "False", "None", "self", "print", "len", "range"],
+    js: ["true", "false", "null", "undefined", "NaN", "console", "log", "window", "document", "Object", "Array", "String", "Number", "Boolean", "JSON", "Promise", "Math"],
+    ts: ["true", "false", "null", "undefined", "NaN", "console", "log", "window", "document", "Object", "Array", "String", "Number", "Boolean", "JSON", "Promise", "Math", "string", "number", "boolean", "any", "void", "unknown", "never"],
+    go: ["string", "int", "int32", "int64", "float32", "float64", "bool", "error", "nil", "true", "false", "make", "append", "panic", "recover", "len", "cap", "print", "println"],
+    php: ["true", "false", "null", "int", "float", "string", "bool", "array", "object", "count", "isset", "empty"]
+  };
+
+  const defaultTypes = ["true", "false", "null", "undefined", "string", "number", "boolean", "void", "any", "nil", "None", "self", "error", "int", "float", "bool"];
+  const types = typesMap[lookupLang] || defaultTypes;
+  const typeRegex = new RegExp(`\\b(${types.join("|")})\\b`, "g");
+  highlighted = highlighted.replace(typeRegex, '<span style="color: #bd93f9;">$1</span>');
+
+  // 5. Functions
+  highlighted = highlighted.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, '<span style="color: #50fa7b;">$1</span>');
+
+  // 6. Numbers
+  highlighted = highlighted.replace(/\b(\d+(\.\d+)?)\b/g, '<span style="color: #ffb86c;">$1</span>');
+
+  // Restore strings
+  strings.forEach((str, idx) => {
+    highlighted = highlighted.replace(`___STRING_TOKEN_${idx}___`, `<span style="color: #f1fa8c;">${str}</span>`);
+  });
+
+  // Restore comments
+  comments.forEach((comment, idx) => {
+    highlighted = highlighted.replace(`___COMMENT_TOKEN_${idx}___`, `<span style="color: #6272a4; font-style: italic;">${comment}</span>`);
+  });
+
+  return highlighted;
+};
 
 
 const Assistant = () => {
@@ -319,14 +403,13 @@ const Assistant = () => {
         // Extract language and code content
         const lines = part.split("\n")
         const firstLine = lines[0].trim()
-        const language = ["python", "javascript", "typescript", "html", "css", "bash", "json", "dart", "yaml"].includes(firstLine.toLowerCase()) 
-          ? firstLine 
-          : ""
         
+        // Dynamically match any alphanumeric language identifier (e.g. js, go, cpp, rust)
+        const language = /^[a-zA-Z0-9#+-]+$/.test(firstLine) ? firstLine : ""
         const code = language ? lines.slice(1).join("\n").trim() : part.trim()
         
         return (
-          <div key={index} className="my-3 rounded-xl overflow-hidden border border-white/10 bg-slate-950/80 font-mono shadow-2xl flex flex-col items-stretch max-w-full glass-card select-text">
+          <div key={index} className="my-3 rounded-xl overflow-hidden border border-white/10 bg-[#282a36] font-mono shadow-2xl flex flex-col items-stretch max-w-full glass-card select-text">
             {/* Header console bar */}
             <div className="flex items-center justify-between px-4 py-2 bg-slate-900/60 border-b border-white/[0.04] text-[10px] uppercase font-bold tracking-wider text-slate-400 select-none flex-shrink-0">
               <span className="text-cyan-400">{language || "code"}</span>
@@ -343,8 +426,8 @@ const Assistant = () => {
               </button>
             </div>
             {/* Syntax-highlight styled container */}
-            <pre className="p-4 text-xs overflow-x-auto text-emerald-300 scrollbar-thin leading-relaxed">
-              <code>{code}</code>
+            <pre className="p-4 text-xs overflow-x-auto scrollbar-thin leading-relaxed text-slate-300">
+              <code dangerouslySetInnerHTML={{ __html: highlightCode(code, language) }} />
             </pre>
           </div>
         )
@@ -359,24 +442,27 @@ const Assistant = () => {
   }
 
   return (
-    <div className="w-full min-h-0 h-full flex flex-col justify-between items-stretch p-6 md:p-10 text-slate-100">
+    <div className="w-full min-h-0 h-full flex flex-col justify-between items-stretch p-4 md:p-6 pb-2 text-slate-100">
       
-      {/* Header */}
-      <div className="animate-fade-in flex-shrink-0">
-        <div className="flex items-center gap-3 text-blue-400 font-semibold uppercase tracking-wider text-xs md:text-sm">
-          <Bot size={16} />
-          <span>{t("assistantBanner")}</span>
+      {/* Sleek Compact Header */}
+      <div className="animate-fade-in flex-shrink-0 flex items-center justify-between border-b border-white/[0.04] pb-3 mb-2">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <Bot size={20} />
+          </div>
+          <div>
+            <h1 className="text-xl md:text-2xl font-black text-white leading-none">
+              {t("assistantTitle")}
+            </h1>
+            <p className="text-[10px] text-slate-400 mt-1 select-none">
+              Amamiya's Digital AI Twin Agent
+            </p>
+          </div>
         </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-white mt-1">
-          {t("assistantTitle")}
-        </h1>
-        <p className="text-sm md:text-base text-slate-400 mt-2">
-          {t("assistantDesc")}
-        </p>
       </div>
 
-      {/* Chat Area */}
-      <div ref={chatLogRef} className="flex-1 my-6 bg-slate-950/40 border border-white/[0.04] rounded-2xl p-4 md:p-6 overflow-y-auto flex flex-col gap-4 scrollbar-thin max-h-[380px]">
+      {/* Chat Area - Expanded to occupy 100% dynamic height! */}
+      <div ref={chatLogRef} className="flex-1 my-3 bg-slate-950/40 border border-white/[0.04] rounded-2xl p-4 md:p-6 overflow-y-auto flex flex-col gap-4 scrollbar-thin min-h-[380px] lg:min-h-[460px]">
         {messages.map((msg, idx) => (
           <div
             key={idx}
@@ -428,7 +514,7 @@ const Assistant = () => {
       </div>
 
       {/* Suggested Prompts & Input */}
-      <div className="space-y-4 flex-shrink-0">
+      <div className="space-y-3 flex-shrink-0">
         {/* Suggestion Chips */}
         <div className="flex flex-wrap gap-2">
           {suggestions[language].map((sug, idx) => (
@@ -460,11 +546,6 @@ const Assistant = () => {
             <Send size={16} />
           </button>
         </form>
-        
-        <div className="flex items-center gap-1.5 text-[10px] text-slate-500 px-1 justify-center md:justify-start">
-          <AlertCircle size={12} className="text-blue-500/70" />
-          <span>{t("assistantAlert")}</span>
-        </div>
       </div>
     </div>
   )
