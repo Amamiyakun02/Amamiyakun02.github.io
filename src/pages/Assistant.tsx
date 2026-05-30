@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react"
-import { Bot, Send, User, Sparkles } from "lucide-react"
+import { Bot, Send, Sparkles } from "lucide-react"
 import { useApp } from "../context/AppContext"
+import avatarProfile from "../assets/images/profile.jpeg"
+import avatarRobin from "../assets/images/robin.jpg"
 
 type Message = {
   id?: string
@@ -471,12 +473,16 @@ const Assistant = () => {
             }`}
           >
             {/* Avatar */}
-            <div className={`p-2 rounded-xl flex-shrink-0 border h-9 w-9 flex items-center justify-center ${
+            <div className={`rounded-xl flex-shrink-0 border h-9 w-9 overflow-hidden flex items-center justify-center ${
               msg.sender === "user"
-                ? "bg-blue-600/10 text-blue-400 border-blue-600/20"
-                : "bg-slate-800 text-slate-300 border-white/[0.08]"
+                ? "border-blue-600/20 bg-blue-600/10 shadow-sm"
+                : "border-white/[0.08] bg-slate-950 shadow-sm"
             }`}>
-              {msg.sender === "user" ? <User size={16} /> : <Bot size={16} />}
+              <img
+                src={msg.sender === "user" ? avatarProfile : avatarRobin}
+                alt={msg.sender === "user" ? "User" : "Robin"}
+                className="w-full h-full object-cover"
+              />
             </div>
 
             {/* Bubble */}
@@ -500,8 +506,12 @@ const Assistant = () => {
         {/* AI Typing Animation */}
         {isTyping && (
           <div className="flex gap-3 max-w-[80%] self-start">
-            <div className="p-2 rounded-xl bg-slate-800 text-slate-300 border border-white/[0.08] h-9 w-9 flex items-center justify-center">
-              <Bot size={16} />
+            <div className="rounded-xl border border-white/[0.08] bg-slate-950 h-9 w-9 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-sm">
+              <img
+                src={avatarRobin}
+                alt="Robin"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="rounded-2xl rounded-tl-none px-4 py-3 bg-slate-900/60 text-slate-300 border border-white/[0.03] flex items-center gap-1.5 h-9">
               <span className="w-1.5 h-1.5 bg-blue-400 rounded-full typing-dot" />

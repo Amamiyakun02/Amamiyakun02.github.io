@@ -2,7 +2,7 @@ import { type ReactNode, useEffect, useState } from "react"
 import { useLocation, useNavigate, Link } from "react-router-dom"
 import { Home, User, Briefcase, Bot, Mail, ChevronLeft, ChevronRight, Sun, Moon } from "lucide-react"
 import Sidebar from "../components/Sidebar"
-import avatar from "../assets/images/profile.jpg"
+import avatar from "../assets/images/profile.jpeg"
 import { useApp } from "../context/AppContext"
 
 type Props = {

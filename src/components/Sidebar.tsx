@@ -1,5 +1,5 @@
 import { Github, Instagram, Linkedin, MessageSquare, ShieldAlert, Cpu, X } from "lucide-react"
-import avatar from "../assets/images/profile.jpg"
+import avatar from "../assets/images/profile.jpeg"
 import { useApp } from "../context/AppContext"
 
 type SidebarProps = {
