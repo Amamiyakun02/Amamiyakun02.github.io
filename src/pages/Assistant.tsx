@@ -90,100 +90,113 @@ const Assistant = () => {
         throw new Error(language === "en" ? "Server communication failed." : "Gagal menghubungi server.")
       }
 
-      // Check if response is fallback plain JSON or SSE Stream
-      const contentType = response.headers.get("content-type") || ""
-      
-      if (contentType.includes("application/json")) {
-        // Plain JSON response fallback
-        const data = await response.json()
-        const responseText = data.response || data.text || data.reply || data.message || JSON.stringify(data)
-        
-        setMessages(prev => [
-          ...prev,
-          {
-            sender: "ai",
-            text: responseText,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          }
-        ])
-        setIsTyping(false)
-      } else {
-        // Real-Time SSE Chunk Streaming!
-        const reader = response.body?.getReader()
-        if (!reader) {
-          throw new Error("Response body is not readable")
-        }
+      // Real-Time Chunk Streaming with Robust JSON Fallback check
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error("Response body is not readable")
+      }
 
-        const decoder = new TextDecoder()
-        let done = false
-        let streamedText = ""
+      const decoder = new TextDecoder()
+      let done = false
+      let streamedText = ""
+      let buffer = ""
+      let isFirstChunk = true
+      let aiMessageId = ""
 
-        // Create placeholder message in state
-        const aiMessageId = "stream_" + Date.now()
-        setMessages(prev => [
-          ...prev,
-          {
-            id: aiMessageId,
-            sender: "ai",
-            text: "",
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          }
-        ])
-        
-        // Turn off static thinking/typing indicator since streaming began!
-        setIsTyping(false)
+      while (!done) {
+        const { value, done: doneReading } = await reader.read()
+        done = doneReading
 
-        let buffer = ""
-        while (!done) {
-          const { value, done: doneReading } = await reader.read()
-          done = doneReading
-          
-          if (value) {
-            buffer += decoder.decode(value, { stream: !done })
-            const lines = buffer.split("\n")
-            // Retain partial line in buffer
-            buffer = lines.pop() || ""
+        if (value) {
+          buffer += decoder.decode(value, { stream: !done })
 
-            for (const line of lines) {
-              const trimmed = line.trim()
-              if (trimmed.startsWith("data: ")) {
-                try {
-                  const jsonStr = trimmed.substring(6).trim()
-                  if (jsonStr) {
-                    const parsed = JSON.parse(jsonStr)
-                    if (parsed.text) {
-                      streamedText += parsed.text
-                      // Push live update
-                      setMessages(prev => 
-                        prev.map(msg => 
-                          msg.id === aiMessageId ? { ...msg, text: streamedText } : msg
-                        )
-                      )
-                    }
+          if (isFirstChunk) {
+            isFirstChunk = false
+            const trimmed = buffer.trim()
+            if (trimmed.startsWith("{") && !trimmed.includes("data:")) {
+              // Plain JSON response fallback (e.g. immediate error or JSON payload)
+              try {
+                const data = JSON.parse(trimmed)
+                const responseText = data.response || data.text || data.reply || data.message || JSON.stringify(data)
+                
+                setMessages(prev => [
+                  ...prev,
+                  {
+                    sender: "ai",
+                    text: responseText,
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                   }
-                } catch (e) {
-                  // Skip parsing if split across TCP boundaries
+                ])
+                setIsTyping(false)
+                return
+              } catch (e) {
+                // Not complete JSON yet, continue to stream parsing
+              }
+            }
+
+            // Create placeholder message in state for SSE streaming
+            aiMessageId = "stream_" + Date.now()
+            setMessages(prev => [
+              ...prev,
+              {
+                id: aiMessageId,
+                sender: "ai",
+                text: "",
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              }
+            ])
+            setIsTyping(false)
+          }
+
+          // Process complete SSE lines
+          const lines = buffer.split("\n")
+          buffer = lines.pop() || ""
+
+          for (const line of lines) {
+            const trimmedLine = line.trim()
+            if (trimmedLine.startsWith("data: ")) {
+              try {
+                const jsonStr = trimmedLine.substring(6).trim()
+                if (jsonStr) {
+                  if (jsonStr === "[DONE]") {
+                    done = true
+                    break
+                  }
+                  const parsed = JSON.parse(jsonStr)
+                  if (parsed.text) {
+                    streamedText += parsed.text
+                    // Push live update to corresponding message bubble
+                    setMessages(prev =>
+                      prev.map(msg =>
+                        msg.id === aiMessageId ? { ...msg, text: streamedText } : msg
+                      )
+                    )
+                  }
                 }
+              } catch (e) {
+                // Ignore split chunks
               }
             }
           }
         }
+      }
 
-        // Process final remnant line in buffer
-        if (buffer.trim().startsWith("data: ")) {
-          try {
-            const jsonStr = buffer.trim().substring(6).trim()
+      // Process any leftover content in the buffer
+      if (buffer.trim().startsWith("data: ")) {
+        try {
+          const jsonStr = buffer.trim().substring(6).trim()
+          if (jsonStr && jsonStr !== "[DONE]") {
             const parsed = JSON.parse(jsonStr)
             if (parsed.text) {
               streamedText += parsed.text
-              setMessages(prev => 
-                prev.map(msg => 
+              setMessages(prev =>
+                prev.map(msg =>
                   msg.id === aiMessageId ? { ...msg, text: streamedText } : msg
                 )
               )
             }
-          } catch (e) {}
-        }
+          }
+        } catch (e) {}
       }
     } catch (error) {
       console.error("AI response error:", error)
