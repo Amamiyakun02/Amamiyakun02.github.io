@@ -515,15 +515,15 @@ const Assistant = () => {
 
       {/* Suggested Prompts & Input */}
       <div className="space-y-3 flex-shrink-0">
-        {/* Suggestion Chips */}
-        <div className="flex flex-wrap gap-2">
+        {/* Suggestion Chips - Horizontal scrollable single row to save vertical space! */}
+        <div className="flex overflow-x-auto no-scrollbar gap-2 pb-1 select-none flex-nowrap w-full">
           {suggestions[language].map((sug, idx) => (
             <button
               key={idx}
               onClick={() => handleSuggestionClick(sug)}
-              className="text-[11px] md:text-xs font-medium text-slate-400 hover:text-white bg-slate-900/40 border border-white/[0.04] hover:border-blue-500/30 hover:bg-slate-900/60 px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1"
+              className="text-[11px] md:text-xs font-semibold text-slate-400 hover:text-white bg-slate-900/40 border border-white/[0.04] hover:border-blue-500/35 hover:bg-slate-900/60 px-3.5 py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 flex-shrink-0"
             >
-              <Sparkles size={10} className="text-blue-500" />
+              <Sparkles size={11} className="text-blue-500" />
               <span>{sug}</span>
             </button>
           ))}
