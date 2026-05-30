@@ -26,11 +26,11 @@ const Contact = () => {
   useEffect(() => {
     setTerminalLines([
       { text: "Stargazer Core Engine v2.4.1 (Linux amd64)", type: "system" },
-      { 
-        text: language === "en" 
-          ? "Type '/help' to list available subroutines." 
-          : "Ketik '/help' untuk melihat subroutine yang tersedia.", 
-        type: "system" 
+      {
+        text: language === "en"
+          ? "Type '/help' to list available subroutines."
+          : "Ketik '/help' untuk melihat subroutine yang tersedia.",
+        type: "system"
       },
       { text: "", type: "system" }
     ])
@@ -47,12 +47,12 @@ const Contact = () => {
     if (!name || !email || !message) return
 
     setIsSubmitting(true)
-    
+
     // Simulate API request
     setTimeout(() => {
       setIsSubmitting(false)
       setIsSubmitted(true)
-      
+
       // Inject message notification into terminal!
       if (language === "en") {
         setTerminalLines(prev => [
@@ -116,11 +116,11 @@ const Contact = () => {
         { text: "64 bytes from localhost: icmp_seq=2 ttl=64 time=0.05 ms", type: "green" },
         { text: "--- amamiya-srv.local ping statistics ---", type: "system" },
         { text: "2 packets transmitted, 2 received, 0% packet loss, time 1002ms", type: "system" },
-        { 
-          text: language === "en" 
-            ? "Connection status: EXCELLENT (System online)" 
-            : "Status Koneksi: SANGAT BAIK (Sistem online)", 
-          type: "success" 
+        {
+          text: language === "en"
+            ? "Connection status: EXCELLENT (System online)"
+            : "Status Koneksi: SANGAT BAIK (Sistem online)",
+          type: "success"
         }
       )
     } else if (lowerCmd === "/about") {
@@ -156,11 +156,11 @@ const Contact = () => {
     } else if (lowerCmd === "/matrix") {
       newLines.push(
         { text: "01000001 01001101 01000001 01001101 01001001 01011001 01000001", type: "green" },
-        { 
-          text: language === "en" 
-            ? ">>>>>>>> LOADING STARGAZER PROTOCOL <<<<<<<<" 
-            : ">>>>>>>> MEMUAT PROTOKOL STARGAZER <<<<<<<<", 
-          type: "green" 
+        {
+          text: language === "en"
+            ? ">>>>>>>> LOADING STARGAZER PROTOCOL <<<<<<<<"
+            : ">>>>>>>> MEMUAT PROTOKOL STARGAZER <<<<<<<<",
+          type: "green"
         },
         { text: "10110100 11001010 01101001 11010110 10010011 00110101 11100011", type: "green" }
       )
@@ -189,7 +189,7 @@ const Contact = () => {
 
   return (
     <div className="w-full min-h-0 h-full flex flex-col justify-start items-stretch p-6 md:p-10 text-slate-100">
-      
+
       {/* Header */}
       <div className="mb-6 animate-fade-in flex-shrink-0">
         <div className="flex items-center gap-3 text-blue-400 font-semibold uppercase tracking-wider text-xs md:text-sm">
@@ -207,7 +207,7 @@ const Contact = () => {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start w-full">
         {/* Left Column: Form & Tiles */}
         <div className="space-y-6">
-          
+
           {/* Direct channels tiles */}
           <div className="grid grid-cols-2 gap-4">
             <a
@@ -226,7 +226,7 @@ const Contact = () => {
             </a>
 
             <a
-              href="mailto:amamiya@example.com"
+              href="mailto:amamiyakun02@gmail.com"
               className="flex items-center gap-3 bg-slate-900/30 border border-white/[0.04] rounded-2xl p-4 hover:bg-blue-500/10 hover:border-blue-500/30 transition-all duration-300 group"
             >
               <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-400 border border-blue-500/20 group-hover:scale-110 transition-transform">
@@ -267,7 +267,7 @@ const Contact = () => {
                       required
                       value={name}
                       onChange={e => setName(e.target.value)}
-                      placeholder="e.g. Shinji"
+                      placeholder="e.g. Amamiya"
                       className="input-glass"
                     />
                   </div>
@@ -278,7 +278,7 @@ const Contact = () => {
                       required
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      placeholder="e.g. shinji@nerv.org"
+                      placeholder="e.g. [EMAIL_ADDRESS]"
                       className="input-glass"
                     />
                   </div>
@@ -342,12 +342,12 @@ const Contact = () => {
                   line.type === "input"
                     ? "text-blue-300 font-semibold"
                     : line.type === "green"
-                    ? "text-emerald-400"
-                    : line.type === "success"
-                    ? "text-blue-400 font-bold"
-                    : line.type === "error"
-                    ? "text-rose-400 font-bold"
-                    : "text-slate-400"
+                      ? "text-emerald-400"
+                      : line.type === "success"
+                        ? "text-blue-400 font-bold"
+                        : line.type === "error"
+                          ? "text-rose-400 font-bold"
+                          : "text-slate-400"
                 }
               >
                 {line.text}
