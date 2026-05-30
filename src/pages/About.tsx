@@ -164,7 +164,7 @@ const About = () => {
   ]
 
   return (
-    <div className="w-full min-h-0 h-full flex flex-col justify-start items-stretch p-6 md:p-10 text-slate-100">
+    <div className="w-full min-h-fit lg:h-full flex flex-col justify-start items-stretch p-5 md:p-10 text-slate-100">
       
       {/* Header */}
       <div className="mb-8 animate-fade-in flex-shrink-0">
@@ -207,7 +207,7 @@ const About = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[420px] overflow-y-auto pr-1 scrollbar-thin">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:max-h-[420px] lg:overflow-y-auto pr-1 scrollbar-thin">
             {filteredSkills.map((skill, idx) => (
               <div
                 key={idx}

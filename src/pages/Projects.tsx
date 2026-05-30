@@ -86,7 +86,7 @@ const Projects = () => {
   }
 
   return (
-    <div className="w-full min-h-0 h-full flex flex-col justify-start items-start p-6 md:p-10 text-slate-100">
+    <div className="w-full min-h-fit lg:h-full flex flex-col justify-start items-start p-5 md:p-10 text-slate-100">
       
       {/* Header */}
       <div className="mb-8 animate-fade-in">
@@ -120,7 +120,7 @@ const Projects = () => {
       </div>
 
       {/* Projects Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full overflow-y-auto max-h-[480px] pr-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full lg:overflow-y-auto lg:max-h-[480px] pr-2">
         {filteredProjects.length > 0 ? (
           filteredProjects.map((project, idx) => {
             const IconComp = project.icon

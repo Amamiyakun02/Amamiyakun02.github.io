@@ -6,7 +6,7 @@ const Home = () => {
   const { t, language, theme } = useApp()
 
   return (
-    <div className={`w-full min-h-0 h-full flex flex-col justify-center items-start p-6 md:p-10 transition-colors ${
+    <div className={`w-full min-h-fit lg:h-full flex flex-col justify-start lg:justify-center items-start p-5 md:p-10 transition-colors ${
       theme === "light" ? "text-slate-800" : "text-slate-100"
     }`}>
 

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react"
-import { Bot, Send, Sparkles } from "lucide-react"
+import { Bot, Send, User, Sparkles } from "lucide-react"
 import { useApp } from "../context/AppContext"
-import avatarProfile from "../assets/images/profile.jpeg"
 import avatarRobin from "../assets/images/robin.jpg"
 
 type Message = {
@@ -473,17 +472,19 @@ const Assistant = () => {
             }`}
           >
             {/* Avatar */}
-            <div className={`rounded-xl flex-shrink-0 border h-9 w-9 overflow-hidden flex items-center justify-center ${
-              msg.sender === "user"
-                ? "border-blue-600/20 bg-blue-600/10 shadow-sm"
-                : "border-white/[0.08] bg-slate-950 shadow-sm"
-            }`}>
-              <img
-                src={msg.sender === "user" ? avatarProfile : avatarRobin}
-                alt={msg.sender === "user" ? "User" : "Robin"}
-                className="w-full h-full object-cover"
-              />
-            </div>
+            {msg.sender === "user" ? (
+              <div className="rounded-xl flex-shrink-0 border border-blue-600/20 bg-blue-600/10 h-9 w-9 flex items-center justify-center text-blue-400 shadow-sm">
+                <User size={16} />
+              </div>
+            ) : (
+              <div className="rounded-xl flex-shrink-0 border border-white/[0.08] bg-slate-950 h-9 w-9 overflow-hidden flex items-center justify-center shadow-sm">
+                <img
+                  src={avatarRobin}
+                  alt="Robin"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
 
             {/* Bubble */}
             <div className={`rounded-2xl px-4 py-3 text-xs md:text-sm leading-relaxed shadow-sm ${
