@@ -3,6 +3,7 @@ import { Bot, Send, User, Sparkles, AlertCircle } from "lucide-react"
 import { useApp } from "../context/AppContext"
 
 type Message = {
+  id?: string
   sender: "ai" | "user"
   text: string
   timestamp: string
@@ -65,9 +66,9 @@ const Assistant = () => {
     setIsTyping(true)
     
     try {
-      // Map complete message history to Pydantic-compatible payload schema for persistent memory
+      // Map complete message history (excluding welcome message at index 0 to guarantee starting with "user" role)
       const apiMessages = [
-        ...messages.map(msg => ({
+        ...messages.slice(1).map(msg => ({
           role: msg.sender === "user" ? "user" : "assistant",
           content: msg.text
         })),
@@ -88,47 +89,102 @@ const Assistant = () => {
       if (!response.ok) {
         throw new Error(language === "en" ? "Server communication failed." : "Gagal menghubungi server.")
       }
+
+      // Check if response is fallback plain JSON or SSE Stream
+      const contentType = response.headers.get("content-type") || ""
       
-      const rawText = await response.text()
-      let responseText = ""
-      
-      if (rawText.trim().startsWith('{')) {
-        // Plain JSON response
-        const data = JSON.parse(rawText)
-        responseText = data.response || data.text || data.reply || data.message || JSON.stringify(data)
+      if (contentType.includes("application/json")) {
+        // Plain JSON response fallback
+        const data = await response.json()
+        const responseText = data.response || data.text || data.reply || data.message || JSON.stringify(data)
+        
+        setMessages(prev => [
+          ...prev,
+          {
+            sender: "ai",
+            text: responseText,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ])
+        setIsTyping(false)
       } else {
-        // SSE Stream response chunk concatenation
-        const lines = rawText.split('\n')
-        for (const line of lines) {
-          const trimmed = line.trim()
-          if (trimmed.startsWith('data: ')) {
-            try {
-              const jsonStr = trimmed.substring(6).trim()
-              if (jsonStr) {
-                const parsed = JSON.parse(jsonStr)
-                if (parsed.text) {
-                  responseText += parsed.text
+        // Real-Time SSE Chunk Streaming!
+        const reader = response.body?.getReader()
+        if (!reader) {
+          throw new Error("Response body is not readable")
+        }
+
+        const decoder = new TextDecoder()
+        let done = false
+        let streamedText = ""
+
+        // Create placeholder message in state
+        const aiMessageId = "stream_" + Date.now()
+        setMessages(prev => [
+          ...prev,
+          {
+            id: aiMessageId,
+            sender: "ai",
+            text: "",
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
+        ])
+        
+        // Turn off static thinking/typing indicator since streaming began!
+        setIsTyping(false)
+
+        let buffer = ""
+        while (!done) {
+          const { value, done: doneReading } = await reader.read()
+          done = doneReading
+          
+          if (value) {
+            buffer += decoder.decode(value, { stream: !done })
+            const lines = buffer.split("\n")
+            // Retain partial line in buffer
+            buffer = lines.pop() || ""
+
+            for (const line of lines) {
+              const trimmed = line.trim()
+              if (trimmed.startsWith("data: ")) {
+                try {
+                  const jsonStr = trimmed.substring(6).trim()
+                  if (jsonStr) {
+                    const parsed = JSON.parse(jsonStr)
+                    if (parsed.text) {
+                      streamedText += parsed.text
+                      // Push live update
+                      setMessages(prev => 
+                        prev.map(msg => 
+                          msg.id === aiMessageId ? { ...msg, text: streamedText } : msg
+                        )
+                      )
+                    }
+                  }
+                } catch (e) {
+                  // Skip parsing if split across TCP boundaries
                 }
               }
-            } catch (e) {
-              // Skip malformed chunks
             }
           }
         }
-      }
 
-      if (!responseText) {
-        throw new Error("Empty response received")
-      }
-      
-      setMessages(prev => [
-        ...prev,
-        {
-          sender: "ai",
-          text: responseText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        // Process final remnant line in buffer
+        if (buffer.trim().startsWith("data: ")) {
+          try {
+            const jsonStr = buffer.trim().substring(6).trim()
+            const parsed = JSON.parse(jsonStr)
+            if (parsed.text) {
+              streamedText += parsed.text
+              setMessages(prev => 
+                prev.map(msg => 
+                  msg.id === aiMessageId ? { ...msg, text: streamedText } : msg
+                )
+              )
+            }
+          } catch (e) {}
         }
-      ])
+      }
     } catch (error) {
       console.error("AI response error:", error)
       const errorText = language === "en"
@@ -240,6 +296,55 @@ const Assistant = () => {
     })
   }
 
+  // Helper to parse dynamic code blocks (markdown syntax ```lang ... ```)
+  const parseMessageContent = (text: string) => {
+    const parts = text.split("```")
+    return parts.map((part, index) => {
+      const isCodeBlock = index % 2 === 1
+      
+      if (isCodeBlock) {
+        // Extract language and code content
+        const lines = part.split("\n")
+        const firstLine = lines[0].trim()
+        const language = ["python", "javascript", "typescript", "html", "css", "bash", "json", "dart", "yaml"].includes(firstLine.toLowerCase()) 
+          ? firstLine 
+          : ""
+        
+        const code = language ? lines.slice(1).join("\n").trim() : part.trim()
+        
+        return (
+          <div key={index} className="my-3 rounded-xl overflow-hidden border border-white/10 bg-slate-950/80 font-mono shadow-2xl flex flex-col items-stretch max-w-full glass-card select-text">
+            {/* Header console bar */}
+            <div className="flex items-center justify-between px-4 py-2 bg-slate-900/60 border-b border-white/[0.04] text-[10px] uppercase font-bold tracking-wider text-slate-400 select-none flex-shrink-0">
+              <span className="text-cyan-400">{language || "code"}</span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  navigator.clipboard.writeText(code)
+                  alert(language === "id" ? "Kode berhasil disalin!" : "Code copied to clipboard!")
+                }}
+                className="text-slate-400 hover:text-white px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700/80 rounded border border-white/5 transition duration-150 active:scale-95 text-[9px] font-bold uppercase tracking-wider"
+              >
+                Copy
+              </button>
+            </div>
+            {/* Syntax-highlight styled container */}
+            <pre className="p-4 text-xs overflow-x-auto text-emerald-300 scrollbar-thin leading-relaxed">
+              <code>{code}</code>
+            </pre>
+          </div>
+        )
+      } else {
+        return (
+          <div key={index} className="space-y-1.5 whitespace-pre-wrap">
+            {renderMessageText(part)}
+          </div>
+        )
+      }
+    })
+  }
+
   return (
     <div className="w-full min-h-0 h-full flex flex-col justify-between items-stretch p-6 md:p-10 text-slate-100">
       
@@ -282,7 +387,7 @@ const Assistant = () => {
                 : "bg-slate-900/60 text-slate-300 border border-white/[0.03] rounded-tl-none"
             }`}>
               <div className="space-y-1.5">
-                {renderMessageText(msg.text)}
+                {parseMessageContent(msg.text)}
               </div>
               <div className={`text-[9px] mt-1.5 text-right select-none ${
                 msg.sender === "user" ? "text-blue-200" : "text-slate-500"
