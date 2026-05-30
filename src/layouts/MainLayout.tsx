@@ -233,7 +233,7 @@ const MainLayout = ({ children }: Props) => {
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className={`flex-1 w-full ${isAssistant ? "overflow-hidden" : "overflow-y-auto"} overflow-x-hidden relative flex flex-col justify-start items-stretch pb-24 lg:pb-8`}
+              className={`flex-1 w-full ${isAssistant ? "overflow-hidden pb-4 lg:pb-8" : "overflow-y-auto pb-24 lg:pb-8"} overflow-x-hidden relative flex flex-col justify-start items-stretch pt-14 lg:pt-0`}
             >
               <div
                 key={currentPath}
