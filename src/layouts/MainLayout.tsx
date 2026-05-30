@@ -21,6 +21,7 @@ const MainLayout = ({ children }: Props) => {
   
   const currentPath = location.pathname
   const currentIndex = PAGE_FLOW.indexOf(currentPath)
+  const isAssistant = currentPath === "/assistant"
 
   const [prevIndex, setPrevIndex] = useState(currentIndex)
   const [direction, setDirection] = useState<"forward" | "backward">("forward")
@@ -121,7 +122,7 @@ const MainLayout = ({ children }: Props) => {
 
 
   return (
-    <div className={`w-screen h-screen fixed inset-0 overflow-hidden flex items-center justify-center p-4 md:p-8 font-sans transition-colors duration-300 ${
+    <div className={`w-screen h-screen fixed inset-0 overflow-hidden flex items-center justify-center px-0 py-1.5 lg:p-8 font-sans transition-colors duration-300 ${
       theme === "light" ? "bg-slate-50 text-slate-800" : "bg-slate-950 text-slate-100"
     }`}>
       
@@ -167,7 +168,7 @@ const MainLayout = ({ children }: Props) => {
       <div className="relative w-full max-w-[1240px] h-full max-h-[780px] z-10 flex items-center justify-center">
 
         {/* 3a. Core Glass Card Layout */}
-        <div className="relative flex flex-col lg:flex-row w-full h-full rounded-[30px] overflow-hidden glass-container">
+        <div className="relative flex flex-col lg:flex-row w-full h-full rounded-2xl lg:rounded-[30px] overflow-hidden glass-container">
           
           {/* Left Side: Dynamic Sidebar */}
           <Sidebar isOpen={isSidebarOpen} />
@@ -177,42 +178,54 @@ const MainLayout = ({ children }: Props) => {
             theme === "light" ? "bg-slate-50/10" : "bg-slate-950/20"
           }`}>
             
-            {/* Theme, Language, & Transition Toggles positioned in top-right of main content area */}
-            <div className="absolute top-6 right-6 z-40 flex items-center gap-2 select-none">
-              {/* Profile Toggle Button - Always Visible */}
-              <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="w-8 h-8 rounded-full border border-slate-200 dark:border-white/[0.08] overflow-hidden bg-slate-950 shadow-sm flex items-center justify-center transition hover:scale-105 active:scale-95 flex-shrink-0"
-                title={language === "en" ? "Toggle Profile Sidebar" : "Buka/Tutup Profil"}
-              >
-                <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
-              </button>
+            {/* Unified Premium Glassmorphic Control Pill */}
+            <div className="absolute top-4 right-4 lg:top-6 lg:right-6 z-40 flex items-center select-none">
+              <div className={`flex items-center gap-2.5 backdrop-blur-md border px-3 py-1.5 rounded-full shadow-md transition-all duration-300 ${
+                theme === "light"
+                  ? "bg-white/80 border-slate-200/80 shadow-[0_2px_12px_rgba(15,23,42,0.04)]"
+                  : "bg-slate-950/70 border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.4)]"
+              }`}>
+                {/* Profile Trigger Button */}
+                <button
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  className="w-7 h-7 rounded-full border border-slate-200 dark:border-white/[0.08] overflow-hidden bg-slate-950 shadow-sm flex items-center justify-center transition hover:scale-110 active:scale-90 flex-shrink-0"
+                  title={language === "en" ? "Toggle Profile Sidebar" : "Buka/Tutup Profil"}
+                >
+                  <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
+                </button>
 
-              {/* Language Toggle Pill */}
-              <button
-                onClick={toggleLanguage}
-                className={`flex items-center gap-1 bg-slate-950/70 border border-white/[0.08] hover:border-blue-500/35 px-3 py-1.5 rounded-full text-xs font-bold font-mono transition duration-200 ${
-                  theme === "light"
-                    ? "bg-white/90 border-slate-200 hover:border-blue-500/40 text-slate-600 hover:text-slate-900 shadow-sm"
-                    : "text-slate-300 hover:text-white"
-                }`}
-                title={language === "en" ? "Switch to Indonesian" : "Ganti ke Bahasa Inggris"}
-              >
-                <span>{language === "en" ? "EN" : "ID"}</span>
-              </button>
+                {/* Divider */}
+                <span className={`w-[1px] h-4 transition-colors duration-300 ${theme === "light" ? "bg-slate-200" : "bg-white/[0.08]"}`} />
 
-              {/* Theme Toggle Button */}
-              <button
-                onClick={toggleTheme}
-                className={`p-2 border hover:border-blue-500/35 rounded-full transition duration-300 flex items-center justify-center ${
-                  theme === "light"
-                    ? "bg-white/90 border-slate-200 hover:border-blue-500/40 text-slate-600 hover:text-slate-900 shadow-sm"
-                    : "bg-slate-950/70 border-white/[0.08] hover:text-white text-slate-300"
-                }`}
-                title={theme === "dark" ? t("homeCtaTwin") : "Switch Mode"}
-              >
-                {theme === "dark" ? <Sun size={14} className="animate-spin-slow" /> : <Moon size={14} />}
-              </button>
+                {/* Language Switcher */}
+                <button
+                  onClick={toggleLanguage}
+                  className={`flex items-center justify-center px-2 py-0.5 rounded-md text-[10px] font-extrabold font-mono transition-all duration-200 hover:scale-105 active:scale-95 ${
+                    theme === "light"
+                      ? "hover:bg-slate-100 text-slate-600 hover:text-slate-900"
+                      : "text-slate-300 hover:text-white hover:bg-white/[0.04]"
+                  }`}
+                  title={language === "en" ? "Switch to Indonesian" : "Ganti ke Bahasa Inggris"}
+                >
+                  {language === "en" ? "EN" : "ID"}
+                </button>
+
+                {/* Divider */}
+                <span className={`w-[1px] h-4 transition-colors duration-300 ${theme === "light" ? "bg-slate-200" : "bg-white/[0.08]"}`} />
+
+                {/* Theme Toggle */}
+                <button
+                  onClick={toggleTheme}
+                  className={`p-1 rounded-full transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-90 ${
+                    theme === "light"
+                      ? "hover:bg-slate-100 text-slate-600 hover:text-slate-900"
+                      : "hover:text-white text-slate-300 hover:bg-white/[0.04]"
+                  }`}
+                  title={theme === "dark" ? t("homeCtaTwin") : "Switch Mode"}
+                >
+                  {theme === "dark" ? <Sun size={13} className="animate-spin-slow text-amber-400" /> : <Moon size={13} className="text-indigo-400" />}
+                </button>
+              </div>
             </div>
 
             {/* Main content body with dynamic smooth fade/slide keyframe transitions and Touch Gestures */}
@@ -220,7 +233,7 @@ const MainLayout = ({ children }: Props) => {
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className="flex-1 w-full overflow-y-auto overflow-x-hidden relative flex flex-col justify-start items-stretch pb-24 lg:pb-8"
+              className={`flex-1 w-full ${isAssistant ? "overflow-hidden" : "overflow-y-auto"} overflow-x-hidden relative flex flex-col justify-start items-stretch pb-24 lg:pb-8`}
             >
               <div
                 key={currentPath}

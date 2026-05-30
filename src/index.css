@@ -110,6 +110,15 @@
   .light .input-glass {
     @apply bg-white/80 border-slate-200/80 focus:border-blue-500/60 focus:ring-blue-500/20 text-slate-800 placeholder-slate-400;
   }
+
+  /* Hide scrollbar utility */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none !important;  /* Chrome, Safari and Opera */
+  }
 }
 
 /* Light Theme Helper Overrides */

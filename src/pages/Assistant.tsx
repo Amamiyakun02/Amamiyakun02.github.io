@@ -462,7 +462,7 @@ const Assistant = () => {
       </div>
 
       {/* Chat Area - Expanded to occupy 100% dynamic height! */}
-      <div ref={chatLogRef} className="flex-1 my-3 bg-slate-950/40 border border-white/[0.04] rounded-2xl p-4 md:p-6 overflow-y-auto flex flex-col gap-4 scrollbar-thin min-h-[380px] lg:min-h-[460px]">
+      <div ref={chatLogRef} className="flex-1 my-3 bg-slate-950/40 border border-white/[0.04] rounded-2xl p-4 md:p-6 overflow-y-auto flex flex-col gap-4 no-scrollbar min-h-0">
         {messages.map((msg, idx) => (
           <div
             key={idx}
