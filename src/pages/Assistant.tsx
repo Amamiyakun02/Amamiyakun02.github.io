@@ -455,7 +455,7 @@ const Assistant = () => {
               {t("assistantTitle")}
             </h1>
             <p className="text-[10px] text-slate-400 mt-1 select-none">
-              Amamiya's Digital AI Twin Agent
+              Amamiya's Personal AI Assistant
             </p>
           </div>
         </div>

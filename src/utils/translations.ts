@@ -80,8 +80,8 @@ export const translations = {
     id: "Lihat Proyek"
   },
   homeCtaTwin: {
-    en: "Chat with Digital Twin",
-    id: "Obrol dengan Kembaran Digital"
+    en: "Chat with AI Assistant",
+    id: "Obrol dengan Asisten AI"
   },
   homeCtaCv: {
     en: "Download CV",
