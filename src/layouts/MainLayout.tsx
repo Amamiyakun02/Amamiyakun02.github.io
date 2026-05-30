@@ -26,6 +26,35 @@ const MainLayout = ({ children }: Props) => {
   const [direction, setDirection] = useState<"forward" | "backward">("forward")
   const [transitionStyle, setTransitionStyle] = useState<"slide" | "zoom" | "3d" | "skew">("slide")
 
+  // Mobile Swipe Gesture State for Page Switching
+  const [touchStartX, setTouchStartX] = useState<number | null>(null)
+  const [touchEndX, setTouchEndX] = useState<number | null>(null)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX)
+    setTouchEndX(null)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.touches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (touchStartX === null || touchEndX === null) return
+    const diffX = touchStartX - touchEndX
+    const minSwipe = 50 // minimum distance in pixels
+
+    if (diffX > minSwipe) {
+      // Swipe left (finger moves right to left) -> Next Page
+      handleNext()
+    } else if (diffX < -minSwipe) {
+      // Swipe right (finger moves left to right) -> Previous Page
+      handlePrev()
+    }
+    setTouchStartX(null)
+    setTouchEndX(null)
+  }
+
   // Dynamic calculation of page switching direction and randomized transition selection
   useEffect(() => {
     if (currentIndex !== prevIndex && currentIndex !== -1 && prevIndex !== -1) {
@@ -111,7 +140,7 @@ const MainLayout = ({ children }: Props) => {
       {/* Left Chevron */}
       <button
         onClick={handlePrev}
-        className={`absolute left-4 lg:left-8 top-1/2 transform -translate-y-1/2 z-50 backdrop-blur-md border hover:border-blue-500/40 rounded-full p-3 transition-all duration-300 group hidden md:block ${
+        className={`absolute left-4 lg:left-8 top-1/2 transform -translate-y-1/2 z-50 backdrop-blur-md border hover:border-blue-500/40 rounded-full p-3 transition-all duration-300 group hidden lg:block ${
           theme === "light"
             ? "bg-white/80 border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 shadow-md"
             : "bg-slate-900/60 border-white/10 text-slate-400 hover:text-white hover:bg-slate-900 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
@@ -124,7 +153,7 @@ const MainLayout = ({ children }: Props) => {
       {/* Right Chevron */}
       <button
         onClick={handleNext}
-        className={`absolute right-4 lg:right-8 top-1/2 transform -translate-y-1/2 z-50 backdrop-blur-md border hover:border-blue-500/40 rounded-full p-3 transition-all duration-300 group hidden md:block ${
+        className={`absolute right-4 lg:right-8 top-1/2 transform -translate-y-1/2 z-50 backdrop-blur-md border hover:border-blue-500/40 rounded-full p-3 transition-all duration-300 group hidden lg:block ${
           theme === "light"
             ? "bg-white/80 border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50 shadow-md"
             : "bg-slate-900/60 border-white/10 text-slate-400 hover:text-white hover:bg-slate-900 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
@@ -138,13 +167,15 @@ const MainLayout = ({ children }: Props) => {
       <div className="relative w-full max-w-[1240px] h-full max-h-[780px] z-10 flex items-center justify-center">
 
         {/* 3a. Core Glass Card Layout */}
-        <div className="relative flex flex-col lg:flex-row w-full h-full bg-slate-900/35 backdrop-blur-xl border border-white/[0.05] rounded-[30px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] glass-container">
+        <div className="relative flex flex-col lg:flex-row w-full h-full rounded-[30px] overflow-hidden glass-container">
           
           {/* Left Side: Dynamic Sidebar */}
           <Sidebar isOpen={isSidebarOpen} />
 
           {/* Right Side: Page Content Wrapper */}
-          <div className="flex-1 flex flex-col justify-between overflow-y-hidden relative bg-slate-950/20">
+          <div className={`flex-1 flex flex-col justify-between overflow-y-hidden relative ${
+            theme === "light" ? "bg-slate-50/10" : "bg-slate-950/20"
+          }`}>
             
             {/* Theme, Language, & Transition Toggles positioned in top-right of main content area */}
             <div className="absolute top-6 right-6 z-40 flex items-center gap-2 select-none">
@@ -184,8 +215,13 @@ const MainLayout = ({ children }: Props) => {
               </button>
             </div>
 
-            {/* Main content body with dynamic smooth fade/slide keyframe transitions */}
-            <main className="flex-1 w-full overflow-y-auto overflow-x-hidden relative flex flex-col justify-start items-stretch pb-24 lg:pb-8">
+            {/* Main content body with dynamic smooth fade/slide keyframe transitions and Touch Gestures */}
+            <main
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="flex-1 w-full overflow-y-auto overflow-x-hidden relative flex flex-col justify-start items-stretch pb-24 lg:pb-8"
+            >
               <div
                 key={currentPath}
                 className={`w-full flex-1 flex flex-col justify-stretch items-stretch ${
@@ -214,8 +250,8 @@ const MainLayout = ({ children }: Props) => {
 
         </div>
 
-        {/* 4. Bottom Dynamic Floating Navigation Pill (Moved outside Glass Card to overlap border perfectly!) */}
-        <div className="absolute bottom-[-22px] left-1/2 transform -translate-x-1/2 z-40 bg-slate-950/80 backdrop-blur-md border border-white/[0.08] px-4 md:px-5 py-2.5 rounded-full flex gap-2 md:gap-3 shadow-2xl glow-blue glass-pill">
+        {/* 4. Bottom Dynamic Floating Navigation Pill (Dynamic position bottom-4 on mobile, bottom-[-22px] on desktop) */}
+        <div className="absolute bottom-4 lg:bottom-[-22px] left-1/2 transform -translate-x-1/2 z-40 bg-slate-950/80 backdrop-blur-md border border-white/[0.08] px-4 md:px-5 py-2.5 rounded-full flex gap-2 md:gap-3 shadow-2xl glow-blue glass-pill">
           <Link to="/" className={getNavLinkClass("/")} title={language === "en" ? "Home" : "Beranda"}>
             <Home size={16} />
           </Link>

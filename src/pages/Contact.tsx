@@ -59,7 +59,7 @@ const Contact = () => {
           ...prev,
           { text: `Guest@stargazer-srv:~$ /send-message --sender "${name}" --email "${email}"`, type: "input" },
           { text: "Encrypting package...", type: "system" },
-          { text: "Transmission handshake: SUCCESS", type: "green" },
+          { text: "Transmission: SUCCESS", type: "green" },
           { text: `Message queued: "Thank you ${name}, I will get in touch with you shortly!"`, type: "success" },
           { text: "", type: "system" }
         ])
@@ -68,7 +68,7 @@ const Contact = () => {
           ...prev,
           { text: `Guest@stargazer-srv:~$ /kirim-pesan --pengirim "${name}" --email "${email}"`, type: "input" },
           { text: "Mengenkripsi paket pesan...", type: "system" },
-          { text: "Handshake pengiriman: SUKSES", type: "green" },
+          { text: "Pengiriman: SUKSES", type: "green" },
           { text: `Pesan antrean: "Terima kasih ${name}, saya akan segera menghubungi Anda!"`, type: "success" },
           { text: "", type: "system" }
         ])
@@ -93,7 +93,7 @@ const Contact = () => {
       if (language === "en") {
         newLines.push(
           { text: "Available subroutines:", type: "system" },
-          { text: "  /ping     - Perform low-latency network handshake", type: "system" },
+          { text: "  /ping     - Check low-latency network connection", type: "system" },
           { text: "  /about    - Query core developer personality matrices", type: "system" },
           { text: "  /skills   - Check engineering skill arrays", type: "system" },
           { text: "  /matrix   - Initialize falling code projection stream", type: "system" },
@@ -102,7 +102,7 @@ const Contact = () => {
       } else {
         newLines.push(
           { text: "Subroutine yang tersedia:", type: "system" },
-          { text: "  /ping     - Lakukan jabat tangan jaringan latensi rendah", type: "system" },
+          { text: "  /ping     - Cek koneksi jaringan latensi rendah", type: "system" },
           { text: "  /about    - Meminta profil dan jati diri pengembang", type: "system" },
           { text: "  /skills   - Memeriksa keahlian aktif pengembang", type: "system" },
           { text: "  /matrix   - Luncurkan aliran proyeksi kode digital", type: "system" },
@@ -118,8 +118,8 @@ const Contact = () => {
         { text: "2 packets transmitted, 2 received, 0% packet loss, time 1002ms", type: "system" },
         { 
           text: language === "en" 
-            ? "Handshake status: EXCELLENT (System online)" 
-            : "Status Jabat Tangan: SANGAT BAIK (Sistem online)", 
+            ? "Connection status: EXCELLENT (System online)" 
+            : "Status Koneksi: SANGAT BAIK (Sistem online)", 
           type: "success" 
         }
       )
