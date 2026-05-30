@@ -32,6 +32,16 @@ const Assistant = () => {
   const [isTyping, setIsTyping] = useState(false)
   const chatLogRef = useRef<HTMLDivElement>(null)
 
+  // Persistent unique user_id to enable session-based conversational memory on the backend!
+  const [userId] = useState(() => {
+    let id = localStorage.getItem("assistant_user_id")
+    if (!id) {
+      id = "user_" + Math.random().toString(36).substring(2, 11)
+      localStorage.setItem("assistant_user_id", id)
+    }
+    return id
+  })
+
   // Initialize welcome message when language changes
   useEffect(() => {
     setMessages([
@@ -55,14 +65,23 @@ const Assistant = () => {
     setIsTyping(true)
     
     try {
+      // Map complete message history to Pydantic-compatible payload schema for persistent memory
+      const apiMessages = [
+        ...messages.map(msg => ({
+          role: msg.sender === "user" ? "user" : "assistant",
+          content: msg.text
+        })),
+        { role: "user", content: userQuery }
+      ]
+
       const response = await fetch("https://myagentic-apps.fastapicloud.dev/v1/assistant/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          message: userQuery,
-          text: userQuery
+          user_id: userId,
+          messages: apiMessages
         })
       })
       
@@ -70,16 +89,37 @@ const Assistant = () => {
         throw new Error(language === "en" ? "Server communication failed." : "Gagal menghubungi server.")
       }
       
-      const data = await response.json()
+      const rawText = await response.text()
+      let responseText = ""
       
-      // Dynamic extraction of AI response text from common API schemas
-      const responseText = 
-        data.response || 
-        data.text || 
-        data.reply || 
-        data.message || 
-        (data.choices?.[0]?.message?.content) ||
-        (typeof data === "string" ? data : JSON.stringify(data))
+      if (rawText.trim().startsWith('{')) {
+        // Plain JSON response
+        const data = JSON.parse(rawText)
+        responseText = data.response || data.text || data.reply || data.message || JSON.stringify(data)
+      } else {
+        // SSE Stream response chunk concatenation
+        const lines = rawText.split('\n')
+        for (const line of lines) {
+          const trimmed = line.trim()
+          if (trimmed.startsWith('data: ')) {
+            try {
+              const jsonStr = trimmed.substring(6).trim()
+              if (jsonStr) {
+                const parsed = JSON.parse(jsonStr)
+                if (parsed.text) {
+                  responseText += parsed.text
+                }
+              }
+            } catch (e) {
+              // Skip malformed chunks
+            }
+          }
+        }
+      }
+
+      if (!responseText) {
+        throw new Error("Empty response received")
+      }
       
       setMessages(prev => [
         ...prev,
