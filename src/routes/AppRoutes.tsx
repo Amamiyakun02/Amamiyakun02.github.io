@@ -2,8 +2,9 @@
 import { Routes, Route } from "react-router-dom"
 import Home from "../pages/Home"
 import About from "../pages/About"
+import Projects from "../pages/Projects"
 import Assistant from "../pages/Assistant"
-import Other from "../pages/Other"
+import Contact from "../pages/Contact"
 import MainLayout from "../layouts/MainLayout"
 
 const AppRoutes = () => {
@@ -11,10 +12,12 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<MainLayout><Home /></MainLayout>} />
       <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+      <Route path="/projects" element={<MainLayout><Projects /></MainLayout>} />
       <Route path="/assistant" element={<MainLayout><Assistant /></MainLayout>} />
-      <Route path="/other" element={<MainLayout><Other /></MainLayout>} />
+      <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
     </Routes>
   )
 }
 
 export default AppRoutes
+

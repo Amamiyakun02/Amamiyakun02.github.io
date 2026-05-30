@@ -2,9 +2,363 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html, body {
+    @apply font-sans antialiased transition-colors duration-300;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-100;
+    background-color: #080b11;
+  }
+
+  /* Light mode body override */
+  .light body {
+    @apply bg-slate-50 text-slate-800;
+    background-color: #f1f5f9;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.6);
+  }
+  .light ::-webkit-scrollbar-track {
+    background: rgba(226, 232, 240, 0.8);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.5);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.8);
+  }
+}
+
 @layer components {
   .all-\[unset\] {
     all: unset;
   }
+
+  /* Glassmorphism Classes */
+  .glass-container {
+    @apply backdrop-blur-xl bg-slate-900/40 border border-white/[0.08] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] transition-all duration-300;
+  }
+
+  .light .glass-container {
+    @apply bg-white/45 border-slate-200/80 shadow-[0_25px_60px_-15px_rgba(15,23,42,0.06)];
+  }
+
+  .glass-card {
+    @apply backdrop-blur-md bg-white/[0.02] border border-white/[0.05] shadow-[0_8px_32px_rgba(0,0,0,0.37)] transition-all duration-300;
+  }
+
+  .light .glass-card {
+    @apply bg-slate-100/40 border-slate-200/70 shadow-[0_8px_32px_rgba(15,23,42,0.03)];
+  }
+
+  .glass-card-hover {
+    @apply glass-card hover:bg-white/[0.06] hover:border-white/[0.12] hover:shadow-[0_8px_32px_rgba(59,130,246,0.15)] transition-all duration-300;
+  }
+
+  .light .glass-card-hover {
+    @apply hover:bg-slate-200/50 hover:border-slate-300/80 hover:shadow-[0_8px_32px_rgba(59,130,246,0.07)];
+  }
+
+  .glass-pill {
+    @apply backdrop-blur-md bg-slate-950/70 border border-white/[0.08] shadow-lg transition-all duration-300;
+  }
+
+  .light .glass-pill {
+    @apply bg-white/90 border-slate-200 shadow-md;
+  }
+  
+  .glass-sidebar {
+    @apply backdrop-blur-lg bg-slate-950/40 border-r border-white/[0.05] transition-all duration-300;
+  }
+
+  .light .glass-sidebar {
+    @apply bg-slate-50/50 border-r border-slate-200/60;
+  }
+
+  /* Glowing and Micro-animations */
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
+  }
+
+  /* Custom input styling */
+  .input-glass {
+    @apply bg-slate-950/50 border border-white/[0.08] focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/30 rounded-xl px-4 py-3 outline-none text-slate-100 placeholder-slate-500 transition-all duration-200;
+  }
+
+  .light .input-glass {
+    @apply bg-white/80 border-slate-200/80 focus:border-blue-500/60 focus:ring-blue-500/20 text-slate-800 placeholder-slate-400;
+  }
 }
+
+/* Light Theme Helper Overrides */
+.light h1, 
+.light h2, 
+.light h3, 
+.light h4, 
+.light h5, 
+.light h6, 
+.light .text-white {
+  color: #0f172a !important;
+}
+
+.light p, 
+.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+.light .text-slate-500 {
+  color: #64748b !important;
+}
+
+.light .bg-slate-950\/50, 
+.light .bg-slate-950\/80, 
+.light .bg-slate-950\/40, 
+.light .bg-slate-950\/70 {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.light .bg-slate-900\/25, 
+.light .bg-slate-900\/30, 
+.light .bg-slate-900\/50, 
+.light .bg-slate-900\/60 {
+  background-color: rgba(241, 245, 249, 0.7) !important;
+}
+
+.light .border-white\/\[0\.04\], 
+.light .border-white\/\[0\.05\], 
+.light .border-white\/\[0\.06\], 
+.light .border-white\/\[0\.08\], 
+.light .border-white\/10 {
+  border-color: rgba(226, 232, 240, 0.8) !important;
+}
+
+.light .bg-slate-950 {
+  background-color: #f8fafc !important;
+}
+
+/* Background animated gradient mesh */
+@keyframes float-slow {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes float-reverse {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-30px, 40px) scale(0.9);
+  }
+  66% {
+    transform: translate(20px, -20px) scale(1.05);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-float-1 {
+  animation: float-slow 15s infinite ease-in-out;
+}
+
+.animate-float-2 {
+  animation: float-reverse 18s infinite ease-in-out;
+}
+
+/* Custom typing animation indicator */
+.typing-dot {
+  animation: typing-bounce 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  40% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+/* Interactive sliding tab indicator helper classes */
+.tab-active-glow {
+  position: relative;
+}
+.tab-active-glow::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  box-shadow: 0 0 8px #3b82f6;
+  border-radius: 9999px;
+}
+
+/* ==========================================================================
+   PREMIUM DYNAMIC BIDIRECTIONAL PAGE CHANGE ANIMATIONS
+   ========================================================================== */
+
+/* 1. Bidirectional Slide Transitions */
+@keyframes slide-forward {
+  from {
+    opacity: 0;
+    transform: translateX(35px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes slide-backward {
+  from {
+    opacity: 0;
+    transform: translateX(-35px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-slide-forward {
+  animation: slide-forward 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-slide-backward {
+  animation: slide-backward 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 2. Bidirectional Zoom Transitions */
+@keyframes zoom-forward {
+  from {
+    opacity: 0;
+    transform: scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes zoom-backward {
+  from {
+    opacity: 0;
+    transform: scale(1.07);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-zoom-forward {
+  animation: zoom-forward 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-zoom-backward {
+  animation: zoom-backward 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 3. Bidirectional 3D Card Flip Transitions */
+@keyframes flip-forward {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(12deg) translateZ(30px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) translateZ(0);
+  }
+}
+@keyframes flip-backward {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(-12deg) translateZ(30px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) translateZ(0);
+  }
+}
+.animate-flip-forward {
+  animation: flip-forward 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-flip-backward {
+  animation: flip-backward 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 4. Bidirectional Skew Slide Transitions */
+@keyframes skew-forward {
+  from {
+    opacity: 0;
+    transform: skewX(-6deg) translateX(35px);
+  }
+  to {
+    opacity: 1;
+    transform: skewX(0deg) translateX(0);
+  }
+}
+@keyframes skew-backward {
+  from {
+    opacity: 0;
+    transform: skewX(6deg) translateX(-35px);
+  }
+  to {
+    opacity: 1;
+    transform: skewX(0deg) translateX(0);
+  }
+}
+.animate-skew-forward {
+  animation: skew-forward 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-skew-backward {
+  animation: skew-backward 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 

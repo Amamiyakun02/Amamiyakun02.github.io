@@ -1,125 +1,124 @@
 import { Link } from "react-router-dom"
-import { Home as HomeIcon, User, Briefcase, Bot, Mail, Phone, Instagram, Facebook, Github, Linkedin, MessageSquare } from "lucide-react"
-import avatar from "../assets/images/profile.jpg"
-import AssistantButton from "../components/AssistantButton"
+import { Briefcase, Bot, Cpu, Terminal, ArrowRight, Download } from "lucide-react"
+import { useApp } from "../context/AppContext"
 
 const Home = () => {
+  const { t, language } = useApp()
+
   return (
-    <div className="min-h-screen bg-[#d5eafd] flex flex-col items-center justify-center px-4 relative overflow-x-hidden isolate">
-
-      {/* Kontainer utama */}
-        <div className="relative flex w-full max-w-screen-2xl bg-slate-50 rounded-[25px] overflow-visible min-h-[800px] shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
-        {/* Tombol Panah Kiri */}
-            <button className="absolute left-[-40px] top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 shadow-md hover:bg-blue-100 transition z-30">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M15 18l-6-6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            </button>
-
-            {/* Tombol Panah Kanan */}
-            <button className="absolute right-[-40px] top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 shadow-md hover:bg-blue-100 transition z-30">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            </button>
-
-        {/* Sidebar */}
-        <div className="w-[300px] bg-slate-800 rounded-[25px] p-6 flex flex-col items-center">
-          <img
-            src={avatar}
-            alt="Profile"
-            className="w-[200px] h-[200px] object-cover rounded-full mt-4"
-          />
-          <h2 className="text-white text-xl font-extrabold mt-4">
-            Amamiya (Maireza)
-          </h2>
-          <p className="text-white text-sm font-medium mt-1">A.I Engineer</p>
-
-          {/* Social Icons */}
-          <div className="mt-8 flex gap-3">
-            <a href="https://wa.me/6283863450720" target="_blank" rel="noreferrer">
-              <MessageSquare size={18} className="text-white hover:text-green-400" />
-            </a>
-            <a href="https://instagram.com/yourusername" target="_blank" rel="noreferrer">
-              <Instagram size={18} className="text-white hover:text-pink-400" />
-            </a>
-            <a href="https://facebook.com/yourusername" target="_blank" rel="noreferrer">
-              <Facebook size={18} className="text-white hover:text-blue-400" />
-            </a>
-            <a href="https://github.com/yourusername" target="_blank" rel="noreferrer">
-              <Github size={18} className="text-white hover:text-gray-300" />
-            </a>
-            <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noreferrer">
-              <Linkedin size={18} className="text-white hover:text-blue-300" />
-            </a>
-          </div>
-
-          {/* Kontak */}
-            <p className="text-white text-xs text-center mt-4 px-2">
-            <Phone size={14} className="inline mr-2" />
-            +6283863450720 or talk directly to my{" "}
-            <a
-                href="https://amamiyakun02.github.io/PersonalAssistant"
-                className="italic underline hover:text-blue-300 transition"
-            >
-                AI Assistant
-            </a>.
-            </p>
-        </div>
-
-        {/* Konten Tengah */}
-        <div className="flex-1 p-10 md:p-14 relative flex flex-col justify-center items-center">
-          <div className="text-[48px] md:text-[60px] text-slate-900 font-normal underline text-center">
-            Hello!, I’m Amamiya
-          </div>
-          <p className="text-base md:text-xl text-slate-800 mt-4 text-center">
-            A.I Engineer | Software Developer | Linux Enthusiast | Toolsmith
-          </p>
-
-          <div className="mt-12 space-y-6 text-center max-w-2xl">
-            <p className="text-sm md:text-lg text-slate-700 leading-relaxed">
-              A developer passionate about creating smart tools and practical AI systems. <br />
-              I focus on building real-world solutions that actually help people.
-            </p>
-            <p className="text-base md:text-xl text-slate-600 font-bold">
-              "Build once, useful forever — clever little solutions for big problems."
-            </p>
-          </div>
-
-          {/* Tombol Aksi */}
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
-            <button className="bg-blue-500 text-white text-sm md:text-lg font-semibold px-6 py-3 rounded-[15px]">
-              See Project
-            </button>
-            <span className="w-[2px] h-[40px] bg-gray-300 hidden md:block" />
-            <button className="bg-blue-500 text-white text-sm md:text-lg font-semibold px-6 py-3 rounded-[15px]">
-              Download CV
-            </button>
-          </div>
-        </div>
-
-        {/* Tombol Assistant di pojok kanan bawah kontainer */}
-        <AssistantButton />
+    <div className="w-full min-h-0 h-full flex flex-col justify-center items-start p-6 md:p-10 text-slate-100">
+      
+      {/* System Classification Banner */}
+      <div className="flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-full text-[10px] uppercase font-bold tracking-widest animate-pulse mb-4 select-none">
+        <Cpu size={12} />
+        <span>System handshake: SECURE (127.0.0.1)</span>
       </div>
 
-{/* Tombol Navigasi (di luar konten, menempel layar bawah) */}
-      <div className="absolute bottom-20 left-[56%] transform -translate-x-1/2 flex gap-4 bg-white shadow-md rounded-[20px] px-6 py-3">
-        <Link to="/" className="hover:bg-blue-100 p-2 rounded-full transition">
-          <HomeIcon size={20} className="text-slate-700" />
-        </Link>
-        <Link to="/about" className="hover:bg-blue-100 p-2 rounded-full transition">
-          <User size={20} className="text-slate-700" />
-        </Link>
-        <Link to="/projects" className="hover:bg-blue-100 p-2 rounded-full transition">
-          <Briefcase size={20} className="text-slate-700" />
-        </Link>
-        <Link to="/assistant" className="hover:bg-blue-100 p-2 rounded-full transition">
-          <Bot size={20} className="text-slate-700" />
-        </Link>
-        <Link to="/contact" className="hover:bg-blue-100 p-2 rounded-full transition">
-          <Mail size={20} className="text-slate-700" />
-        </Link>
+      {/* Main Greeting with dynamic typing-style text */}
+      <div className="max-w-2xl">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tight">
+          {t("homeIntro")} <br className="md:hidden" />
+          <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent ml-1">
+            Amamiya
+          </span>
+        </h1>
+        
+        <p className="text-base md:text-lg text-slate-400 mt-4 font-semibold leading-relaxed">
+          {t("homeRole")}
+        </p>
       </div>
+
+      {/* Modern Tagline Callout */}
+      <div className="w-full max-w-2xl bg-white/[0.02] border border-white/[0.04] p-5 rounded-2xl mt-6 relative overflow-hidden group select-none">
+        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-cyan-400" />
+        <p className="text-xs md:text-sm text-slate-400 italic leading-relaxed">
+          "{t("homeMaxim")}"
+        </p>
+        <div className="text-[10px] font-bold text-blue-400 mt-2 font-mono uppercase tracking-wider">
+          — {t("homeMaximTitle")}
+        </div>
+      </div>
+
+      {/* Specialization Modules - Gorgeous grid of hoverable interactive cards */}
+      <div className="w-full mt-8">
+        <h3 className="text-xs font-black uppercase tracking-wider text-slate-500 mb-4 select-none">{t("homeVerticals")}</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+          
+          {/* Card 1: AI Agent pipelines */}
+          <div className="bg-slate-900/25 border border-white/[0.04] rounded-2xl p-5 hover:bg-slate-900/40 hover:border-blue-500/25 hover:-translate-y-1 transition duration-300 group">
+            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400 border border-blue-500/10 w-fit group-hover:scale-110 transition-transform">
+              <Bot size={18} />
+            </div>
+            <h4 className="text-sm font-extrabold text-white mt-4 group-hover:text-blue-400 transition-colors">{t("homeCard1Title")}</h4>
+            <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+              {t("homeCard1Desc")}
+            </p>
+          </div>
+
+          {/* Card 2: Web & Mobile */}
+          <div className="bg-slate-900/25 border border-white/[0.04] rounded-2xl p-5 hover:bg-slate-900/40 hover:border-cyan-500/25 hover:-translate-y-1 transition duration-300 group">
+            <div className="p-3 bg-cyan-500/10 rounded-xl text-cyan-400 border border-cyan-500/10 w-fit group-hover:scale-110 transition-transform">
+              <Cpu size={18} />
+            </div>
+            <h4 className="text-sm font-extrabold text-white mt-4 group-hover:text-cyan-400 transition-colors">{t("homeCard2Title")}</h4>
+            <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+              {t("homeCard2Desc")}
+            </p>
+          </div>
+
+          {/* Card 3: Linux & Tools */}
+          <div className="bg-slate-900/25 border border-white/[0.04] rounded-2xl p-5 hover:bg-slate-900/40 hover:border-purple-500/25 hover:-translate-y-1 transition duration-300 group">
+            <div className="p-3 bg-purple-500/10 rounded-xl text-purple-400 border border-purple-500/10 w-fit group-hover:scale-110 transition-transform">
+              <Terminal size={18} />
+            </div>
+            <h4 className="text-sm font-extrabold text-white mt-4 group-hover:text-purple-400 transition-colors">{t("homeCard3Title")}</h4>
+            <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+              {t("homeCard3Desc")}
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Action Buttons with high-tech glowing styles */}
+      <div className="mt-8 flex flex-wrap items-center gap-4 select-none">
+        
+        {/* CTA 1: View creations */}
+        <Link
+          to="/projects"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs md:text-sm py-3 px-5 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/45 transition duration-300 group"
+        >
+          <Briefcase size={14} />
+          <span>{t("homeCtaProjects")}</span>
+          <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+        </Link>
+        
+        {/* CTA 2: Chat with Agent */}
+        <Link
+          to="/assistant"
+          className="flex items-center gap-2 bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-white/[0.08] hover:border-blue-500/35 font-semibold text-xs md:text-sm py-3 px-5 rounded-xl transition duration-300"
+        >
+          <Bot size={14} className="text-blue-400" />
+          <span>{t("homeCtaTwin")}</span>
+        </Link>
+
+        {/* Separator Line */}
+        <span className="w-[1px] h-[30px] bg-white/[0.08] hidden sm:block" />
+
+        {/* CTA 3: Download CV */}
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault()
+            alert(language === "en" ? "Handshaking: CV download module loading..." : "Jabat Tangan: Mengunduh berkas CV...")
+          }}
+          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white font-semibold transition"
+        >
+          <Download size={14} />
+          <span>{t("homeCtaCv")}</span>
+        </a>
+      </div>
+
     </div>
   )
 }
