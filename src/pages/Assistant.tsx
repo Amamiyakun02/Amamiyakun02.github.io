@@ -510,7 +510,7 @@ const Assistant = () => {
   }
 
   return (
-    <div className="w-full flex-1 min-h-0 flex flex-col justify-between items-stretch p-4 pb-20 lg:pb-4 md:p-6 text-slate-100">
+    <div className="w-full flex-1 min-h-0 flex flex-col justify-between items-stretch p-4 pb-36 lg:pb-4 md:p-6 text-slate-100">
       {/* Sleek Compact Header */}
       <div className="animate-fade-in flex-shrink-0 flex items-center justify-between border-b border-white/[0.04] pb-3 mb-2">
         <div className="flex items-center gap-2.5">

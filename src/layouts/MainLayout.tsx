@@ -110,7 +110,7 @@ const MainLayout = ({ children }: Props) => {
     navigate(PAGE_FLOW[nextIdx])
   }
 
-  // Helper to determine active route styles
+  // Helper to determine active route styles (desktop pill)
   const getNavLinkClass = (path: string) => {
     const isActive = currentPath === path
     return `relative p-3 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 ${
@@ -118,6 +118,16 @@ const MainLayout = ({ children }: Props) => {
         ? "bg-blue-600 text-white shadow-md shadow-blue-500/30 scale-110"
         : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] dark:hover:bg-white/[0.04]"
     }`
+  }
+
+  // Helper for mobile arc satellite items
+  const getArcNavClass = (path: string) => {
+    const isActive = currentPath === path
+    return `arc-nav-item flex flex-col items-center justify-center w-12 h-12 rounded-full border transition-all duration-300 active:scale-90 ${
+      isActive
+        ? "bg-blue-600 border-blue-500/60 text-white shadow-lg shadow-blue-500/40"
+        : "bg-slate-900/70 border-white/[0.08] text-slate-400 hover:text-white hover:border-blue-500/30 hover:bg-slate-800/80"
+    } backdrop-blur-md`
   }
 
 
@@ -236,7 +246,7 @@ const MainLayout = ({ children }: Props) => {
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className={`flex-1 min-h-0 w-full ${isAssistant ? "overflow-hidden pb-4 lg:pb-8" : "overflow-y-auto pb-24 lg:pb-8"} overflow-x-hidden relative flex flex-col justify-start items-stretch pt-14 lg:pt-0`}
+              className={`flex-1 min-h-0 w-full ${isAssistant ? "overflow-hidden pb-4 lg:pb-8" : "overflow-y-auto pb-36 lg:pb-8"} overflow-x-hidden relative flex flex-col justify-start items-stretch pt-14 lg:pt-0`}
             >
               <div
                 key={currentPath}
@@ -266,8 +276,65 @@ const MainLayout = ({ children }: Props) => {
 
         </div>
 
-        {/* 4. Bottom Floating Navigation Pill — bottom-6 on mobile for safe chrome clearance, -22px below card on desktop */}
-        <div className="bottom-nav-pill absolute bottom-6 lg:bottom-[-22px] left-1/2 -translate-x-1/2 z-[100] bg-slate-950/80 backdrop-blur-md border border-white/[0.08] px-4 md:px-5 py-2.5 rounded-full flex gap-2 md:gap-3 shadow-2xl glow-blue glass-pill">
+        {/* 4a. Mobile Arc Navbar — only visible on small screens (hidden lg:hidden) */}
+        <div className="arc-navbar-mobile lg:hidden">
+          {/* Satellite menu items in arc above Home */}
+          {/* About — far left */}
+          <Link
+            to="/about"
+            className={getArcNavClass("/about") + " arc-item-1"}
+            title={language === "en" ? "About" : "Tentang"}
+          >
+            <User size={18} />
+            <span className="text-[8px] font-semibold mt-0.5 leading-none">{language === "en" ? "About" : "Tentang"}</span>
+          </Link>
+
+          {/* Projects — left */}
+          <Link
+            to="/projects"
+            className={getArcNavClass("/projects") + " arc-item-2"}
+            title={language === "en" ? "Projects" : "Proyek"}
+          >
+            <Briefcase size={18} />
+            <span className="text-[8px] font-semibold mt-0.5 leading-none">{language === "en" ? "Work" : "Proyek"}</span>
+          </Link>
+
+          {/* HOME — center FAB */}
+          <Link
+            to="/"
+            className={`arc-home-btn flex items-center justify-center w-16 h-16 rounded-full border-2 transition-all duration-300 active:scale-90 shadow-2xl z-10 ${
+              currentPath === "/"
+                ? "bg-blue-600 border-blue-400 shadow-blue-500/60 text-white"
+                : "bg-blue-600/90 border-blue-500/70 shadow-blue-500/40 text-white hover:bg-blue-500"
+            }`}
+            title={language === "en" ? "Home" : "Beranda"}
+          >
+            <Home size={24} />
+          </Link>
+
+          {/* Assistant — right */}
+          <Link
+            to="/assistant"
+            className={getArcNavClass("/assistant") + " arc-item-3"}
+            title={language === "en" ? "Assistant" : "Asisten"}
+          >
+            <Bot size={18} />
+            <span className="text-[8px] font-semibold mt-0.5 leading-none">{language === "en" ? "AI" : "AI"}</span>
+          </Link>
+
+          {/* Contact — far right */}
+          <Link
+            to="/contact"
+            className={getArcNavClass("/contact") + " arc-item-4"}
+            title={language === "en" ? "Contact" : "Kontak"}
+          >
+            <Mail size={18} />
+            <span className="text-[8px] font-semibold mt-0.5 leading-none">{language === "en" ? "Contact" : "Kontak"}</span>
+          </Link>
+        </div>
+
+        {/* 4b. Desktop Pill Navbar — hidden on mobile */}
+        <div className="bottom-nav-pill absolute hidden lg:flex bottom-[-22px] left-1/2 -translate-x-1/2 z-[100] bg-slate-950/80 backdrop-blur-md border border-white/[0.08] px-4 md:px-5 py-2.5 rounded-full gap-2 md:gap-3 shadow-2xl glow-blue glass-pill">
           <Link to="/" className={getNavLinkClass("/")} title={language === "en" ? "Home" : "Beranda"}>
             <Home size={16} />
           </Link>
