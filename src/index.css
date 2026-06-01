@@ -171,6 +171,16 @@
   background-color: #f8fafc !important;
 }
 
+/* Bottom Nav Pill - Mobile Safe Area Fix */
+/* Only override `bottom` on mobile to clear Android gesture bar & browser chrome.
+   On desktop (>=1024px) Tailwind's lg:bottom-[-22px] takes full control. */
+@media (max-width: 1023px) {
+  .bottom-nav-pill {
+    /* Push above safe area (home indicator on iOS, gesture bar on Android) */
+    bottom: max(24px, calc(16px + env(safe-area-inset-bottom, 0px)));
+  }
+}
+
 /* Background animated gradient mesh */
 @keyframes float-slow {
   0% {

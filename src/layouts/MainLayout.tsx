@@ -122,9 +122,12 @@ const MainLayout = ({ children }: Props) => {
 
 
   return (
-    <div className={`w-screen h-screen fixed inset-0 overflow-hidden flex items-center justify-center px-0 py-1.5 lg:p-8 font-sans transition-colors duration-300 ${
-      theme === "light" ? "bg-slate-50 text-slate-800" : "bg-slate-950 text-slate-100"
-    }`}>
+    <div
+      className={`w-screen fixed inset-0 overflow-hidden flex items-center justify-center px-0 py-1.5 lg:p-8 font-sans transition-colors duration-300 nav-root ${
+        theme === "light" ? "bg-slate-50 text-slate-800" : "bg-slate-950 text-slate-100"
+      }`}
+      style={{ height: '100dvh' }}
+    >
       
       {/* 1. Dynamic Glowing mesh background blobs */}
       <div className={`absolute top-[-10%] left-[-15%] w-[350px] md:w-[600px] h-[350px] md:h-[600px] rounded-full blur-[90px] md:blur-[130px] animate-float-1 pointer-events-none select-none z-0 transition-colors duration-500 ${
@@ -168,7 +171,7 @@ const MainLayout = ({ children }: Props) => {
       <div className="relative w-full max-w-[1240px] h-full max-h-[780px] z-10 flex items-center justify-center">
 
         {/* 3a. Core Glass Card Layout */}
-        <div className="relative flex flex-col lg:flex-row w-full h-full rounded-2xl lg:rounded-[30px] overflow-hidden glass-container">
+        <div className="relative flex flex-col lg:flex-row w-full h-full rounded-2xl lg:rounded-[30px] overflow-hidden glass-container" style={{isolation: 'auto'}}>
           
           {/* Left Side: Dynamic Sidebar */}
           <Sidebar isOpen={isSidebarOpen} />
@@ -263,8 +266,8 @@ const MainLayout = ({ children }: Props) => {
 
         </div>
 
-        {/* 4. Bottom Dynamic Floating Navigation Pill (Dynamic position bottom-4 on mobile, bottom-[-22px] on desktop) */}
-        <div className="absolute bottom-4 lg:bottom-[-22px] left-1/2 transform -translate-x-1/2 z-40 bg-slate-950/80 backdrop-blur-md border border-white/[0.08] px-4 md:px-5 py-2.5 rounded-full flex gap-2 md:gap-3 shadow-2xl glow-blue glass-pill">
+        {/* 4. Bottom Floating Navigation Pill — bottom-6 on mobile for safe chrome clearance, -22px below card on desktop */}
+        <div className="bottom-nav-pill absolute bottom-6 lg:bottom-[-22px] left-1/2 -translate-x-1/2 z-[100] bg-slate-950/80 backdrop-blur-md border border-white/[0.08] px-4 md:px-5 py-2.5 rounded-full flex gap-2 md:gap-3 shadow-2xl glow-blue glass-pill">
           <Link to="/" className={getNavLinkClass("/")} title={language === "en" ? "Home" : "Beranda"}>
             <Home size={16} />
           </Link>
