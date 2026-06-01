@@ -671,7 +671,7 @@ const Assistant = () => {
             value={inputText}
             onChange={e => setInputText(e.target.value)}
             placeholder={language === "en" ? "Ask anything (e.g. 'skills' or 'projects')..." : "Tanyakan apa saja (misal: 'keahlian' atau 'proyek')..."}
-            className="flex-1 input-glass h-11"
+            className="flex-1 min-w-0 input-glass h-11"
           />
           <button
             type="submit"
