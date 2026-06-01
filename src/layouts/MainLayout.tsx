@@ -120,13 +120,31 @@ const MainLayout = ({ children }: Props) => {
     }`
   }
 
+  // Arc navbar toggle state
+  const [isArcOpen, setIsArcOpen] = useState(false)
+
+  // Auto-close arc when navigating
+  useEffect(() => {
+    setIsArcOpen(false)
+  }, [currentPath])
+
+  // Home FAB: if arc closed → open; if arc open → navigate home + close
+  const handleFabClick = () => {
+    if (isArcOpen) {
+      navigate("/")
+      setIsArcOpen(false)
+    } else {
+      setIsArcOpen(true)
+    }
+  }
+
   // Helper for mobile arc satellite items
   const getArcNavClass = (path: string) => {
     const isActive = currentPath === path
-    return `arc-nav-item flex flex-col items-center justify-center w-12 h-12 rounded-full border transition-all duration-300 active:scale-90 ${
+    return `arc-nav-item flex flex-col items-center justify-center w-11 h-11 rounded-full border transition-all duration-300 active:scale-90 ${
       isActive
-        ? "bg-blue-600 border-blue-500/60 text-white shadow-lg shadow-blue-500/40"
-        : "bg-slate-900/70 border-white/[0.08] text-slate-400 hover:text-white hover:border-blue-500/30 hover:bg-slate-800/80"
+        ? "bg-blue-600 border-blue-500/50 text-white shadow-md shadow-blue-500/30"
+        : "bg-slate-900/80 border-white/[0.10] text-slate-300 hover:text-white hover:border-blue-500/40 hover:bg-slate-800/90"
     } backdrop-blur-md`
   }
 
@@ -276,61 +294,70 @@ const MainLayout = ({ children }: Props) => {
 
         </div>
 
-        {/* 4a. Mobile Arc Navbar — only visible on small screens (hidden lg:hidden) */}
+        {/* 4a. Mobile Arc Navbar — toggle open/close, compact overlapping items */}
         <div className="arc-navbar-mobile lg:hidden">
-          {/* Satellite menu items in arc above Home */}
+
+          {/* --- Satellite items (only visible when arc is open) --- */}
           {/* About — far left */}
           <Link
             to="/about"
-            className={getArcNavClass("/about") + " arc-item-1"}
+            onClick={() => setIsArcOpen(false)}
+            className={getArcNavClass("/about") + " arc-item-1" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
+            style={{ transitionDelay: isArcOpen ? '0.06s' : '0s' }}
             title={language === "en" ? "About" : "Tentang"}
           >
-            <User size={18} />
-            <span className="text-[8px] font-semibold mt-0.5 leading-none">{language === "en" ? "About" : "Tentang"}</span>
+            <User size={16} />
+            <span className="text-[8px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "About" : "Tentang"}</span>
           </Link>
 
           {/* Projects — left */}
           <Link
             to="/projects"
-            className={getArcNavClass("/projects") + " arc-item-2"}
+            onClick={() => setIsArcOpen(false)}
+            className={getArcNavClass("/projects") + " arc-item-2" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
+            style={{ transitionDelay: isArcOpen ? '0.03s' : '0.03s' }}
             title={language === "en" ? "Projects" : "Proyek"}
           >
-            <Briefcase size={18} />
-            <span className="text-[8px] font-semibold mt-0.5 leading-none">{language === "en" ? "Work" : "Proyek"}</span>
-          </Link>
-
-          {/* HOME — center FAB */}
-          <Link
-            to="/"
-            className={`arc-home-btn flex items-center justify-center w-16 h-16 rounded-full border-2 transition-all duration-300 active:scale-90 shadow-2xl z-10 ${
-              currentPath === "/"
-                ? "bg-blue-600 border-blue-400 shadow-blue-500/60 text-white"
-                : "bg-blue-600/90 border-blue-500/70 shadow-blue-500/40 text-white hover:bg-blue-500"
-            }`}
-            title={language === "en" ? "Home" : "Beranda"}
-          >
-            <Home size={24} />
+            <Briefcase size={16} />
+            <span className="text-[8px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "Work" : "Proyek"}</span>
           </Link>
 
           {/* Assistant — right */}
           <Link
             to="/assistant"
-            className={getArcNavClass("/assistant") + " arc-item-3"}
+            onClick={() => setIsArcOpen(false)}
+            className={getArcNavClass("/assistant") + " arc-item-3" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
+            style={{ transitionDelay: isArcOpen ? '0.03s' : '0.03s' }}
             title={language === "en" ? "Assistant" : "Asisten"}
           >
-            <Bot size={18} />
-            <span className="text-[8px] font-semibold mt-0.5 leading-none">{language === "en" ? "AI" : "AI"}</span>
+            <Bot size={16} />
+            <span className="text-[8px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "AI" : "AI"}</span>
           </Link>
 
           {/* Contact — far right */}
           <Link
             to="/contact"
-            className={getArcNavClass("/contact") + " arc-item-4"}
+            onClick={() => setIsArcOpen(false)}
+            className={getArcNavClass("/contact") + " arc-item-4" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
+            style={{ transitionDelay: isArcOpen ? '0.06s' : '0s' }}
             title={language === "en" ? "Contact" : "Kontak"}
           >
-            <Mail size={18} />
-            <span className="text-[8px] font-semibold mt-0.5 leading-none">{language === "en" ? "Contact" : "Kontak"}</span>
+            <Mail size={16} />
+            <span className="text-[8px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "Contact" : "Kontak"}</span>
           </Link>
+
+          {/* HOME FAB — always visible center button */}
+          <button
+            onClick={handleFabClick}
+            className={`arc-home-btn flex items-center justify-center w-14 h-14 rounded-full border-2 transition-all duration-300 active:scale-90 shadow-2xl ${
+              currentPath === "/" && !isArcOpen
+                ? "bg-blue-600 border-blue-400 shadow-blue-500/50 text-white scale-110"
+                : "bg-blue-600 border-blue-500/60 shadow-blue-500/40 text-white"
+            } ${isArcOpen ? "rotate-45" : "rotate-0"}`}
+            title={isArcOpen ? (language === "en" ? "Go Home" : "Ke Beranda") : (language === "en" ? "Open Menu" : "Buka Menu")}
+          >
+            {isArcOpen ? <Home size={22} /> : <Home size={22} />}
+          </button>
         </div>
 
         {/* 4b. Desktop Pill Navbar — hidden on mobile */}

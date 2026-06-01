@@ -179,16 +179,15 @@
 /* Outer container: positioned at bottom-center of the wrapper div */
 .arc-navbar-mobile {
   position: absolute;
-  /* Center horizontally */
   left: 50%;
   transform: translateX(-50%);
   /* Safe area bottom clearance */
-  bottom: max(14px, calc(8px + env(safe-area-inset-bottom, 0px)));
-  /* Size: wide enough to contain arc items */
-  width: 280px;
-  height: 110px;
+  bottom: max(12px, calc(8px + env(safe-area-inset-bottom, 0px)));
+  /* Compact container — items cluster close together */
+  width: 220px;
+  height: 120px;
   z-index: 100;
-  pointer-events: none; /* let children handle pointer events */
+  pointer-events: none;
 }
 
 /* All arc children are absolutely positioned */
@@ -197,91 +196,79 @@
   pointer-events: all;
 }
 
-/* HOME button - centered at bottom */
+/* ── HOME FAB ─────────────────────────────────────────────── */
+/* Always visible, centered at bottom of container */
 .arc-home-btn {
-  /* Center bottom of the container */
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  /* Pulsing glow ring when active */
+  z-index: 10;
   animation: home-glow-pulse 3s infinite ease-in-out;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.3s ease,
+              background-color 0.2s ease;
+}
+
+/* When open, FAB rotates 45° to hint "tap to go home" */
+.arc-home-btn.rotate-45 {
+  transform: translateX(-50%) rotate(45deg);
 }
 
 @keyframes home-glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 8px 32px rgba(0,0,0,0.5); }
-  50%       { box-shadow: 0 0 32px rgba(59, 130, 246, 0.7), 0 8px 32px rgba(0,0,0,0.5); }
+  0%, 100% { box-shadow: 0 0 18px rgba(59,130,246,0.45), 0 6px 24px rgba(0,0,0,0.5); }
+  50%       { box-shadow: 0 0 28px rgba(59,130,246,0.75), 0 6px 24px rgba(0,0,0,0.5); }
 }
 
 /*
-  Arc layout: 4 items spread in a semicircle above Home.
-  Home center = (140px, 32px) from container top-left (bottom:0 left:50%).
-  Arc radius ≈ 90px. Angles from -150° to -30° (sweeping from left to right above).
+  Tight arc — r≈62px, container 220px wide.
+  Home center: left=110, bottom=28 (FAB is 56px, center-y=28).
+  Items are 44px (w-11), half=22px.
 
-  Item 1 (About):     angle -155°  → cos(-155°)≈-0.906, sin(-155°)≈-0.423
-  Item 2 (Projects):  angle -120°  → cos(-120°)≈-0.5,   sin(-120°)≈-0.866
-  Item 3 (Assistant): angle -60°   → cos(-60°) ≈0.5,    sin(-60°) ≈-0.866
-  Item 4 (Contact):   angle -25°   → cos(-25°) ≈0.906,  sin(-25°) ≈-0.423
-
-  Positions relative to Home center (bottom=32px, left=140px):
-  Each item is 48px wide so center offset = -24px.
-
-  About:     left = 140 + 90*cos(-155°) - 24 = 140 - 81.5 - 24 ≈ 34px,  bottom = 32 - 90*sin(-155°) = 32 + 38.1 ≈ 70px
-  Projects:  left = 140 + 90*cos(-120°) - 24 = 140 - 45 - 24 ≈ 71px,    bottom = 32 - 90*sin(-120°) = 32 + 77.9 ≈ 110px → cap to 100px
-  Assistant: left = 140 + 90*cos(-60°) - 24  = 140 + 45 - 24 ≈ 161px,   bottom = 32 + 77.9 ≈ 110px → cap to 100px
-  Contact:   left = 140 + 90*cos(-25°) - 24  = 140 + 81.5 - 24 ≈ 197px, bottom = 32 + 38.1 ≈ 70px
+  About:     left=110-52-22=36 → 10px (nudged in), bottom=28+33=61 → 59px
+  Projects:  left=110-23-22=65 → 50px,              bottom=28+57=85 → 84px
+  Assistant: right=220-110-23-22=65 → right=50px,   bottom=84px
+  Contact:   right=220-110-52-22=36 → right=10px,   bottom=59px
 */
 
-/* About — far left arc */
-.arc-item-1 {
-  bottom: 68px;
-  left: 28px;
-  animation: arc-item-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  animation-delay: 0.05s;
-}
-
-/* Projects — left arc */
-.arc-item-2 {
-  bottom: 98px;
-  left: 68px;
-  animation: arc-item-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  animation-delay: 0.1s;
-}
-
-/* Assistant — right arc */
-.arc-item-3 {
-  bottom: 98px;
-  right: 68px;
-  animation: arc-item-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  animation-delay: 0.1s;
-}
-
-/* Contact — far right arc */
+/* Each satellite item — transition for open/close toggle */
+.arc-item-1,
+.arc-item-2,
+.arc-item-3,
 .arc-item-4 {
-  bottom: 68px;
-  right: 28px;
-  animation: arc-item-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  animation-delay: 0.05s;
+  transition: opacity 0.25s ease, transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes arc-item-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.5) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+/* About — far left */
+.arc-item-1 { bottom: 59px; left: 10px; }
+
+/* Projects — inner left (overlaps home FAB) */
+.arc-item-2 { bottom: 84px; left: 50px; }
+
+/* Assistant — inner right (overlaps home FAB) */
+.arc-item-3 { bottom: 84px; right: 50px; }
+
+/* Contact — far right */
+.arc-item-4 { bottom: 59px; right: 10px; }
+
+/* ── TOGGLE ANIMATION CLASSES ────────────────────────────── */
+
+/* Open state: items pop out to their positions */
+.arc-item-visible {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: all;
 }
 
-/* Glow ring for active arc item */
+/* Closed state: items shrink back to FAB center, invisible */
+.arc-item-hidden {
+  opacity: 0;
+  transform: scale(0.2);
+  pointer-events: none;
+}
+
+/* Active item subtle glow */
 .arc-nav-item.bg-blue-600 {
-  animation: arc-active-glow 2.5s infinite ease-in-out;
-}
-
-@keyframes arc-active-glow {
-  0%, 100% { box-shadow: 0 0 12px rgba(59, 130, 246, 0.5); }
-  50%       { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.6);
 }
 
 /* Bottom Nav Pill - Mobile Safe Area Fix */
