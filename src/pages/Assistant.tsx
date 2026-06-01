@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Bot, Send, User, Sparkles } from "lucide-react"
+import { Bot, Send, User, Sparkles, ChevronUp, Cpu } from "lucide-react"
 import { useApp } from "../context/AppContext"
 import avatarRobin from "../assets/images/robin.jpg"
 
@@ -11,19 +11,36 @@ type Message = {
 }
 
 const suggestions = {
-  en: [
-    "What is your core tech stack?",
-    "Tell me about your AI/ML projects.",
-    "What is your dev philosophy?",
-    "How can I hire or contact you?"
-  ],
-  id: [
-    "Apa teknologi utama Anda?",
-    "Ceritakan tentang proyek AI Anda.",
-    "Apa filosofi koding Anda?",
-    "Bagaimana cara menghubungi Anda?"
-  ]
+  openai: {
+    en: [
+      "What is your core tech stack?",
+      "Tell me about your AI/ML projects.",
+      "What is your dev philosophy?",
+      "How can I hire or contact you?"
+    ],
+    id: [
+      "Apa teknologi utama Anda?",
+      "Ceritakan tentang proyek AI Anda.",
+      "Apa filosofi koding Anda?",
+      "Bagaimana cara menghubungi Anda?"
+    ]
+  },
+  gemini: {
+    en: [
+      "Tell me about your Linux scripting.",
+      "What is your educational background?",
+      "Show me some of your recent works.",
+      "How can we collaborate together?"
+    ],
+    id: [
+      "Ceritakan tentang penulisan skrip Linux Anda.",
+      "Bagaimana latar belakang pendidikan Anda?",
+      "Tampilkan beberapa proyek terbaru Anda.",
+      "Bagaimana cara kita berkolaborasi?"
+    ]
+  }
 }
+
 
 
 const escapeHtml = (text: string) => {
@@ -68,7 +85,7 @@ const highlightCode = (code: string, lang: string): string => {
   };
 
   const defaultKeywords = ["if", "else", "for", "while", "return", "class", "import", "const", "var", "let", "function", "def", "func", "fn", "struct", "package", "type", "interface", "new", "try", "catch", "break", "continue", "switch", "case"];
-  
+
   const lookupLang = l === "typescript" || l === "tsx" ? "ts" : l === "javascript" || l === "jsx" ? "js" : l === "golang" ? "go" : l === "shell" || l === "sh" ? "bash" : l;
   const keywords = keywordsMap[lookupLang] || defaultKeywords;
 
@@ -110,13 +127,53 @@ const highlightCode = (code: string, lang: string): string => {
 };
 
 
+const OpenAILogo = ({ className = "w-3.5 h-3.5", isActive = false }: { className?: string, isActive?: boolean }) => {
+  return (
+    <img
+      src="/openai.svg"
+      className={`${className} object-contain transition-all duration-200 ${isActive
+        ? "brightness-0 invert opacity-100"
+        : "brightness-0 invert opacity-60 hover:opacity-100"
+        }`}
+      alt="OpenAI"
+    />
+  )
+}
+
+const GeminiLogo = ({ className = "w-3.5 h-3.5", isActive = false }: { className?: string, isActive?: boolean }) => {
+  return (
+    <img
+      src="/gemini.svg"
+      className={`${className} object-contain transition-all duration-200 ${isActive
+        ? "opacity-100"
+        : "opacity-60 hover:opacity-100"
+        }`}
+      alt="Gemini"
+    />
+  )
+}
+
+
 const Assistant = () => {
   const { t, language } = useApp()
-  
+
+  const [selectedModel, setSelectedModel] = useState<"openai" | "gemini">("openai")
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState("")
   const [isTyping, setIsTyping] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const chatLogRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   // Persistent unique user_id to enable session-based conversational memory on the backend!
   const [userId] = useState(() => {
@@ -128,18 +185,21 @@ const Assistant = () => {
     return id
   })
 
-  // Initialize welcome message when language changes
+  // Initialize welcome message when language or selectedModel changes
   useEffect(() => {
+    const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.5";
+    const welcomeText = language === "en"
+      ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
+      : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`;
+
     setMessages([
       {
         sender: "ai",
-        text: language === "en" 
-          ? "Hello! I am Robin, Amamiya's dynamic AI Assistant. Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!"
-          : "Halo! Saya Robin, Asisten AI Amamiya yang dinamis. Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!",
+        text: welcomeText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
     ])
-  }, [language])
+  }, [language, selectedModel])
 
   useEffect(() => {
     if (chatLogRef.current) {
@@ -149,7 +209,7 @@ const Assistant = () => {
 
   const triggerAIResponse = async (userQuery: string) => {
     setIsTyping(true)
-    
+
     try {
       // Map complete message history (excluding welcome message at index 0 to guarantee starting with "user" role)
       const apiMessages = [
@@ -160,7 +220,13 @@ const Assistant = () => {
         { role: "user", content: userQuery }
       ]
 
-      const response = await fetch("https://myagentic-apps.fastapicloud.dev/v1/assistant/chat", {
+      const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      const baseUrl = isLocalhost ? "http://127.0.0.1:8000" : "https://myagentic-apps.fastapicloud.dev";
+      const endpoint = selectedModel === "openai"
+        ? `${baseUrl}/v1/assistant/chat`
+        : `${baseUrl}/v1/gemini/chat`
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -170,7 +236,7 @@ const Assistant = () => {
           messages: apiMessages
         })
       })
-      
+
       if (!response.ok) {
         throw new Error(language === "en" ? "Server communication failed." : "Gagal menghubungi server.")
       }
@@ -203,7 +269,7 @@ const Assistant = () => {
               try {
                 const data = JSON.parse(trimmed)
                 const responseText = data.response || data.text || data.reply || data.message || JSON.stringify(data)
-                
+
                 setMessages(prev => [
                   ...prev,
                   {
@@ -281,14 +347,15 @@ const Assistant = () => {
               )
             }
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     } catch (error) {
       console.error("AI response error:", error)
+      const assistantName = selectedModel === "openai" ? "Robin" : "Luna"
       const errorText = language === "en"
-        ? "Apologies, I encountered an issue establishing a secure link with Robin's server terminal. Please verify your connection or try again."
-        : "Mohon maaf, saya mengalami kegagalan transmisi data dengan terminal server Robin. Silakan periksa koneksi Anda atau coba lagi."
-      
+        ? `Apologies, I encountered an issue establishing a secure link with ${assistantName}'s server terminal. Please verify your connection or try again.`
+        : `Mohon maaf, saya mengalami kegagalan transmisi data dengan terminal server ${assistantName}. Silakan periksa koneksi Anda atau coba lagi.`
+
       setMessages(prev => [
         ...prev,
         {
@@ -376,7 +443,7 @@ const Assistant = () => {
           if (idx % 2 === 1) {
             return <strong key={idx} className="text-white font-bold dark:text-white">{p}</strong>
           }
-          
+
           // Basic check for Markdown Link [text](url)
           const linkMatch = p.match(/\[(.*?)\]\((.*?)\)/)
           if (linkMatch) {
@@ -399,16 +466,16 @@ const Assistant = () => {
     const parts = text.split("```")
     return parts.map((part, index) => {
       const isCodeBlock = index % 2 === 1
-      
+
       if (isCodeBlock) {
         // Extract language and code content
         const lines = part.split("\n")
         const firstLine = lines[0].trim()
-        
+
         // Dynamically match any alphanumeric language identifier (e.g. js, go, cpp, rust)
         const language = /^[a-zA-Z0-9#+-]+$/.test(firstLine) ? firstLine : ""
         const code = language ? lines.slice(1).join("\n").trim() : part.trim()
-        
+
         return (
           <div key={index} className="my-3 rounded-xl overflow-hidden border border-white/10 bg-[#282a36] font-mono shadow-2xl flex flex-col items-stretch max-w-full glass-card select-text">
             {/* Header console bar */}
@@ -444,7 +511,6 @@ const Assistant = () => {
 
   return (
     <div className="w-full flex-1 min-h-0 flex flex-col justify-between items-stretch p-4 pb-20 lg:pb-4 md:p-6 text-slate-100">
-      
       {/* Sleek Compact Header */}
       <div className="animate-fade-in flex-shrink-0 flex items-center justify-between border-b border-white/[0.04] pb-3 mb-2">
         <div className="flex items-center gap-2.5">
@@ -456,7 +522,7 @@ const Assistant = () => {
               {t("assistantTitle")}
             </h1>
             <p className="text-[10px] text-slate-400 mt-1 select-none">
-              Amamiya's Personal AI Assistant
+              {selectedModel === "openai" ? "Amamiya's Personal AI Assistant (OpenAI Edition)" : "Amamiya's Personal AI Assistant (Gemini-3.5 Edition)"}
             </p>
           </div>
         </div>
@@ -467,9 +533,8 @@ const Assistant = () => {
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            className={`flex gap-3 max-w-[85%] ${
-              msg.sender === "user" ? "self-end flex-row-reverse" : "self-start"
-            }`}
+            className={`flex gap-3 max-w-[85%] ${msg.sender === "user" ? "self-end flex-row-reverse" : "self-start"
+              }`}
           >
             {/* Avatar */}
             {msg.sender === "user" ? (
@@ -477,7 +542,10 @@ const Assistant = () => {
                 <User size={16} />
               </div>
             ) : (
-              <div className="rounded-xl flex-shrink-0 border border-white/[0.08] bg-slate-950 h-9 w-9 overflow-hidden flex items-center justify-center shadow-sm">
+              <div className={`rounded-xl flex-shrink-0 border overflow-hidden h-9 w-9 flex items-center justify-center shadow-sm transition-all duration-300 ${selectedModel === "openai"
+                ? "border-blue-500/30 bg-slate-950 shadow-[0_0_10px_rgba(59,130,246,0.25)]"
+                : "border-purple-500/30 bg-slate-950 shadow-[0_0_10px_rgba(168,85,247,0.25)]"
+                }`}>
                 <img
                   src={avatarRobin}
                   alt="Robin"
@@ -487,17 +555,15 @@ const Assistant = () => {
             )}
 
             {/* Bubble */}
-            <div className={`rounded-2xl px-4 py-3 text-xs md:text-sm leading-relaxed shadow-sm ${
-              msg.sender === "user"
-                ? "bg-blue-600 text-white rounded-tr-none"
-                : "bg-slate-900/60 text-slate-300 border border-white/[0.03] rounded-tl-none"
-            }`}>
+            <div className={`rounded-2xl px-4 py-3 text-xs md:text-sm leading-relaxed shadow-sm ${msg.sender === "user"
+              ? "bg-blue-600 text-white rounded-tr-none"
+              : "bg-slate-900/60 text-slate-300 border border-white/[0.03] rounded-tl-none"
+              }`}>
               <div className="space-y-1.5">
                 {parseMessageContent(msg.text)}
               </div>
-              <div className={`text-[9px] mt-1.5 text-right select-none ${
-                msg.sender === "user" ? "text-blue-200" : "text-slate-500"
-              }`}>
+              <div className={`text-[9px] mt-1.5 text-right select-none ${msg.sender === "user" ? "text-blue-200" : "text-slate-500"
+                }`}>
                 {msg.timestamp}
               </div>
             </div>
@@ -507,7 +573,10 @@ const Assistant = () => {
         {/* AI Typing Animation */}
         {isTyping && (
           <div className="flex gap-3 max-w-[80%] self-start">
-            <div className="rounded-xl border border-white/[0.08] bg-slate-950 h-9 w-9 overflow-hidden flex items-center justify-center flex-shrink-0 shadow-sm">
+            <div className={`rounded-xl border overflow-hidden h-9 w-9 flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 ${selectedModel === "openai"
+              ? "border-blue-500/30 bg-slate-950 shadow-[0_0_10px_rgba(59,130,246,0.25)]"
+              : "border-purple-500/30 bg-slate-950 shadow-[0_0_10px_rgba(168,85,247,0.25)]"
+              }`}>
               <img
                 src={avatarRobin}
                 alt="Robin"
@@ -528,7 +597,7 @@ const Assistant = () => {
       <div className="space-y-3 flex-shrink-0">
         {/* Suggestion Chips - Horizontal scrollable single row to save vertical space! */}
         <div className="flex overflow-x-auto no-scrollbar gap-2 pb-1 select-none flex-nowrap w-full">
-          {suggestions[language].map((sug, idx) => (
+          {suggestions[selectedModel][language].map((sug, idx) => (
             <button
               key={idx}
               onClick={() => handleSuggestionClick(sug)}
@@ -541,18 +610,73 @@ const Assistant = () => {
         </div>
 
         {/* Form Input */}
-        <form onSubmit={handleSendMessage} className="flex gap-2">
+        <form onSubmit={handleSendMessage} className="flex gap-2 items-center">
+          {/* Premium Upward-Floating Model Selector Dropdown next to chat input */}
+          <div ref={dropdownRef} className="relative flex-shrink-0 select-none">
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className={`h-11 px-3.5 rounded-xl text-[10px] md:text-xs font-bold uppercase flex items-center gap-2 border transition-all duration-200 active:scale-95 cursor-pointer ${selectedModel === "openai"
+                ? "bg-blue-600/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:bg-blue-600/20"
+                : "bg-purple-600/10 border-purple-500/30 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.15)] hover:bg-purple-600/20"
+                }`}
+              title="Select AI Model Engine"
+            >
+              {selectedModel === "openai" ? (
+                <OpenAILogo className="w-3.5 h-3.5 animate-pulse" isActive={true} />
+              ) : (
+                <GeminiLogo className="w-3.5 h-3.5 animate-pulse" isActive={true} />
+              )}
+              <span>{selectedModel === "openai" ? "OpenAI" : "Gemini-3.5"}</span>
+              <ChevronUp size={12} className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {/* Dropdown Menu - Floats upward cleanly above the input bar */}
+            {isDropdownOpen && (
+              <div className="absolute bottom-full mb-2 left-0 w-44 bg-slate-950/95 backdrop-blur-xl border border-white/[0.08] rounded-xl p-1 shadow-2xl z-50 animate-fade-in flex flex-col gap-0.5 shadow-blue-500/5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedModel("openai")
+                    setIsDropdownOpen(false)
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition duration-150 flex items-center gap-2 cursor-pointer ${selectedModel === "openai"
+                    ? "bg-blue-600 text-white shadow-md glow-blue"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                >
+                  <OpenAILogo className="w-3.5 h-3.5" isActive={selectedModel === "openai"} />
+                  <span>OpenAI</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedModel("gemini")
+                    setIsDropdownOpen(false)
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition duration-150 flex items-center gap-2 cursor-pointer ${selectedModel === "gemini"
+                    ? "bg-purple-600 text-white shadow-md glow-purple"
+                    : "text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                >
+                  <GeminiLogo className="w-3.5 h-3.5" isActive={selectedModel === "gemini"} />
+                  <span>Gemini-3.5</span>
+                </button>
+              </div>
+            )}
+          </div>
+
           <input
             type="text"
             value={inputText}
             onChange={e => setInputText(e.target.value)}
             placeholder={language === "en" ? "Ask anything (e.g. 'skills' or 'projects')..." : "Tanyakan apa saja (misal: 'keahlian' atau 'proyek')..."}
-            className="flex-1 input-glass"
+            className="flex-1 input-glass h-11"
           />
           <button
             type="submit"
             disabled={!inputText.trim() || isTyping}
-            className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white rounded-xl px-4 py-3 flex items-center justify-center shadow-lg shadow-blue-500/20 transition-all"
+            className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white rounded-xl h-11 w-11 flex items-center justify-center shadow-lg shadow-blue-500/20 transition-all active:scale-95 flex-shrink-0"
           >
             <Send size={16} />
           </button>
