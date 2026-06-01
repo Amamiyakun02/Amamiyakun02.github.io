@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Bot, Send, User, Sparkles, ChevronUp, Cpu } from "lucide-react"
+import { Bot, Send, User, Sparkles, ChevronUp } from "lucide-react"
 import { useApp } from "../context/AppContext"
 import avatarRobin from "../assets/images/robin.jpg"
 
