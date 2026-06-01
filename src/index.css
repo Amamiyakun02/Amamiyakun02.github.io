@@ -183,9 +183,9 @@
   transform: translateX(-50%);
   /* Safe area bottom clearance */
   bottom: max(12px, calc(8px + env(safe-area-inset-bottom, 0px)));
-  /* Compact container — items cluster close together */
-  width: 220px;
-  height: 120px;
+  /* Compact container — items cluster super close together */
+  width: 200px;
+  height: 110px;
   z-index: 100;
   pointer-events: none;
 }
@@ -220,14 +220,21 @@
 }
 
 /*
-  Tight arc — r≈62px, container 220px wide.
-  Home center: left=110, bottom=28 (FAB is 56px, center-y=28).
-  Items are 44px (w-11), half=22px.
+  Super tight arc — items 40px, almost touching (4-6px gap between edges).
+  Container: 200px wide, 110px tall.
+  Home FAB: 56px center at left=100, bottom=0, center-y=28.
+  Items: 40px (w-10), half=20px.
 
-  About:     left=110-52-22=36 → 10px (nudged in), bottom=28+33=61 → 59px
-  Projects:  left=110-23-22=65 → 50px,              bottom=28+57=85 → 84px
-  Assistant: right=220-110-23-22=65 → right=50px,   bottom=84px
-  Contact:   right=220-110-52-22=36 → right=10px,   bottom=59px
+  r=50px, angles: -155°, -115°, -65°, -25°
+    About:    cos=-0.906, sin=-0.423 → left=100-45.3-20=34.7→35,  bottom=28+21.1=49.1→49
+    Projects: cos=-0.423, sin=-0.906 → left=100-21.1-20=58.9→59,  bottom=28+45.3=73.3→73
+    Assistant:cos=+0.423, sin=-0.906 → right=200-(100+21.1)-20=58.9→59, bottom=73
+    Contact:  cos=+0.906, sin=-0.423 → right=200-(100+45.3)-20=34.7→35, bottom=49
+
+  Item edge gaps:
+    About(35-75)  to Projects(59-99):  59-75 = -16px → they OVERLAP ~16px ✓ touching!
+    Projects(59-99) to FAB(72-128):    72-99 = -27px → overlap with FAB ✓ close!
+    Symmetric on right side.
 */
 
 /* Each satellite item — transition for open/close toggle */
@@ -235,31 +242,29 @@
 .arc-item-2,
 .arc-item-3,
 .arc-item-4 {
-  transition: opacity 0.25s ease, transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.22s ease, transform 0.30s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* About — far left */
-.arc-item-1 { bottom: 59px; left: 10px; }
+/* About — far left, very close */
+.arc-item-1 { bottom: 49px; left: 8px; }
 
-/* Projects — inner left (overlaps home FAB) */
-.arc-item-2 { bottom: 84px; left: 50px; }
+/* Projects — inner left, almost touching home FAB */
+.arc-item-2 { bottom: 73px; left: 46px; }
 
-/* Assistant — inner right (overlaps home FAB) */
-.arc-item-3 { bottom: 84px; right: 50px; }
+/* Assistant — inner right, almost touching home FAB */
+.arc-item-3 { bottom: 73px; right: 46px; }
 
-/* Contact — far right */
-.arc-item-4 { bottom: 59px; right: 10px; }
+/* Contact — far right, very close */
+.arc-item-4 { bottom: 49px; right: 8px; }
 
 /* ── TOGGLE ANIMATION CLASSES ────────────────────────────── */
 
-/* Open state: items pop out to their positions */
 .arc-item-visible {
   opacity: 1;
   transform: scale(1);
   pointer-events: all;
 }
 
-/* Closed state: items shrink back to FAB center, invisible */
 .arc-item-hidden {
   opacity: 0;
   transform: scale(0.2);
@@ -268,7 +273,37 @@
 
 /* Active item subtle glow */
 .arc-nav-item.bg-blue-600 {
-  box-shadow: 0 0 14px rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+}
+
+/* ── FAB CENTER ICON SWAP ANIMATION ──────────────────────── */
+/* Triggered by key={currentPath} — re-mounts on every route change */
+
+.fab-icon-anim {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+}
+
+/* Navigate forward (higher index) → new icon slides in from right */
+.fab-icon-from-right {
+  animation: fab-slide-from-right 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Navigate backward (lower index) → new icon slides in from left */
+.fab-icon-from-left {
+  animation: fab-slide-from-left 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes fab-slide-from-right {
+  from { transform: translateX(65%) scale(0.35); opacity: 0; }
+  to   { transform: translateX(0)   scale(1);    opacity: 1; }
+}
+
+@keyframes fab-slide-from-left {
+  from { transform: translateX(-65%) scale(0.35); opacity: 0; }
+  to   { transform: translateX(0)    scale(1);    opacity: 1; }
 }
 
 /* Bottom Nav Pill - Mobile Safe Area Fix */

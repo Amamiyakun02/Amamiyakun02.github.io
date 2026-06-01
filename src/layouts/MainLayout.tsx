@@ -128,23 +128,35 @@ const MainLayout = ({ children }: Props) => {
     setIsArcOpen(false)
   }, [currentPath])
 
-  // Home FAB: if arc closed → open; if arc open → navigate home + close
+  // FAB: ONLY toggles open/close — never refreshes or navigates
   const handleFabClick = () => {
-    if (isArcOpen) {
-      navigate("/")
-      setIsArcOpen(false)
-    } else {
-      setIsArcOpen(true)
+    setIsArcOpen(prev => !prev)
+  }
+
+  // Satellite item click: navigate + close arc
+  const handleSatelliteClick = (path: string) => {
+    setIsArcOpen(false)
+    navigate(path)
+  }
+
+  // Returns the icon for the currently active page (shown in center FAB)
+  const getCurrentPageIcon = (size = 22) => {
+    switch (currentPath) {
+      case '/about':     return <User size={size} />
+      case '/projects':  return <Briefcase size={size} />
+      case '/assistant': return <Bot size={size} />
+      case '/contact':   return <Mail size={size} />
+      default:           return <Home size={size} />
     }
   }
 
   // Helper for mobile arc satellite items
   const getArcNavClass = (path: string) => {
     const isActive = currentPath === path
-    return `arc-nav-item flex flex-col items-center justify-center w-11 h-11 rounded-full border transition-all duration-300 active:scale-90 ${
+    return `arc-nav-item flex flex-col items-center justify-center w-10 h-10 rounded-full border transition-colors duration-200 active:scale-90 ${
       isActive
         ? "bg-blue-600 border-blue-500/50 text-white shadow-md shadow-blue-500/30"
-        : "bg-slate-900/80 border-white/[0.10] text-slate-300 hover:text-white hover:border-blue-500/40 hover:bg-slate-800/90"
+        : "bg-slate-900/85 border-white/[0.12] text-slate-300 hover:text-white hover:border-blue-500/40 hover:bg-slate-800/90"
     } backdrop-blur-md`
   }
 
@@ -294,69 +306,70 @@ const MainLayout = ({ children }: Props) => {
 
         </div>
 
-        {/* 4a. Mobile Arc Navbar — toggle open/close, compact overlapping items */}
+        {/* 4a. Mobile Arc Navbar — toggle only, icon follows active page */}
         <div className="arc-navbar-mobile lg:hidden">
 
-          {/* --- Satellite items (only visible when arc is open) --- */}
           {/* About — far left */}
-          <Link
-            to="/about"
-            onClick={() => setIsArcOpen(false)}
+          <button
+            onClick={() => handleSatelliteClick("/about")}
             className={getArcNavClass("/about") + " arc-item-1" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
-            style={{ transitionDelay: isArcOpen ? '0.06s' : '0s' }}
+            style={{ transitionDelay: isArcOpen ? '0.07s' : '0s' }}
             title={language === "en" ? "About" : "Tentang"}
           >
-            <User size={16} />
-            <span className="text-[8px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "About" : "Tentang"}</span>
-          </Link>
+            <User size={15} />
+            <span className="text-[7px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "About" : "Tentang"}</span>
+          </button>
 
-          {/* Projects — left */}
-          <Link
-            to="/projects"
-            onClick={() => setIsArcOpen(false)}
+          {/* Projects — inner left */}
+          <button
+            onClick={() => handleSatelliteClick("/projects")}
             className={getArcNavClass("/projects") + " arc-item-2" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
-            style={{ transitionDelay: isArcOpen ? '0.03s' : '0.03s' }}
+            style={{ transitionDelay: isArcOpen ? '0.035s' : '0.035s' }}
             title={language === "en" ? "Projects" : "Proyek"}
           >
-            <Briefcase size={16} />
-            <span className="text-[8px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "Work" : "Proyek"}</span>
-          </Link>
+            <Briefcase size={15} />
+            <span className="text-[7px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "Work" : "Proyek"}</span>
+          </button>
 
-          {/* Assistant — right */}
-          <Link
-            to="/assistant"
-            onClick={() => setIsArcOpen(false)}
+          {/* Assistant — inner right */}
+          <button
+            onClick={() => handleSatelliteClick("/assistant")}
             className={getArcNavClass("/assistant") + " arc-item-3" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
-            style={{ transitionDelay: isArcOpen ? '0.03s' : '0.03s' }}
+            style={{ transitionDelay: isArcOpen ? '0.035s' : '0.035s' }}
             title={language === "en" ? "Assistant" : "Asisten"}
           >
-            <Bot size={16} />
-            <span className="text-[8px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "AI" : "AI"}</span>
-          </Link>
+            <Bot size={15} />
+            <span className="text-[7px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "AI" : "AI"}</span>
+          </button>
 
           {/* Contact — far right */}
-          <Link
-            to="/contact"
-            onClick={() => setIsArcOpen(false)}
+          <button
+            onClick={() => handleSatelliteClick("/contact")}
             className={getArcNavClass("/contact") + " arc-item-4" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
-            style={{ transitionDelay: isArcOpen ? '0.06s' : '0s' }}
+            style={{ transitionDelay: isArcOpen ? '0.07s' : '0s' }}
             title={language === "en" ? "Contact" : "Kontak"}
           >
-            <Mail size={16} />
-            <span className="text-[8px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "Contact" : "Kontak"}</span>
-          </Link>
+            <Mail size={15} />
+            <span className="text-[7px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "Contact" : "Kontak"}</span>
+          </button>
 
-          {/* HOME FAB — always visible center button */}
+          {/* CENTER FAB — only toggles open/close, icon = current active page */}
           <button
             onClick={handleFabClick}
-            className={`arc-home-btn flex items-center justify-center w-14 h-14 rounded-full border-2 transition-all duration-300 active:scale-90 shadow-2xl ${
-              currentPath === "/" && !isArcOpen
-                ? "bg-blue-600 border-blue-400 shadow-blue-500/50 text-white scale-110"
-                : "bg-blue-600 border-blue-500/60 shadow-blue-500/40 text-white"
-            } ${isArcOpen ? "rotate-45" : "rotate-0"}`}
-            title={isArcOpen ? (language === "en" ? "Go Home" : "Ke Beranda") : (language === "en" ? "Open Menu" : "Buka Menu")}
+            className={`arc-home-btn flex items-center justify-center w-14 h-14 rounded-full border-2 overflow-hidden
+              bg-blue-600 border-blue-500/60 text-white shadow-2xl shadow-blue-500/40
+              transition-transform duration-300 active:scale-90`}
+            title={isArcOpen ? (language === "en" ? "Close Menu" : "Tutup Menu") : (language === "en" ? "Open Menu" : "Buka Menu")}
           >
-            {isArcOpen ? <Home size={22} /> : <Home size={22} />}
+            {/* Icon animates slide left/right based on navigation direction */}
+            <span
+              key={currentPath}
+              className={`fab-icon-anim ${
+                direction === 'forward' ? 'fab-icon-from-right' : 'fab-icon-from-left'
+              }`}
+            >
+              {getCurrentPageIcon(22)}
+            </span>
           </button>
         </div>
 
