@@ -616,7 +616,7 @@ const Assistant = () => {
             <button
               type="button"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`h-11 px-3.5 rounded-xl text-[10px] md:text-xs font-bold uppercase flex items-center gap-2 border transition-all duration-200 active:scale-95 cursor-pointer ${selectedModel === "openai"
+              className={`h-11 px-2.5 sm:px-3.5 rounded-xl text-[10px] md:text-xs font-bold uppercase flex items-center gap-1.5 sm:gap-2 border transition-all duration-200 active:scale-95 cursor-pointer ${selectedModel === "openai"
                 ? "bg-blue-600/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:bg-blue-600/20"
                 : "bg-purple-600/10 border-purple-500/30 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.15)] hover:bg-purple-600/20"
                 }`}
@@ -627,7 +627,7 @@ const Assistant = () => {
               ) : (
                 <GeminiLogo className="w-3.5 h-3.5 animate-pulse" isActive={true} />
               )}
-              <span>{selectedModel === "openai" ? "OpenAI" : "Gemini-3.5"}</span>
+              <span className="hidden sm:inline">{selectedModel === "openai" ? "OpenAI" : "Gemini-3.5"}</span>
               <ChevronUp size={12} className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
             </button>
 
