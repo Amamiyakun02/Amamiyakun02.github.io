@@ -276,6 +276,33 @@
   box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
 }
 
+/* ── SATELLITE ENTRY ANIMATION ───────────────────────────── */
+/* Fires on first mount of each satellite. Since arc-item-visible takes over
+   the final state, animation runs briefly and then the transition class wins. */
+.arc-satellite-enter {
+  animation: arc-satellite-in 0.30s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+@keyframes arc-satellite-in {
+  from { opacity: 0; transform: scale(0.6) translateY(10px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+
+/* ── SELECTING FLASH ─────────────────────────────────────── */
+/* Glow+scale pulse when user taps a satellite (180ms before navigation fires) */
+.arc-item-selecting {
+  animation: arc-select-flash 0.18s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes arc-select-flash {
+  0%   { filter: brightness(1)   drop-shadow(0 0 0px rgba(59,130,246,0)); }
+  60%  { filter: brightness(1.4) drop-shadow(0 0 10px rgba(59,130,246,1)); }
+  100% { filter: brightness(1.2) drop-shadow(0 0 6px rgba(59,130,246,0.7)); }
+}
+
+
+
 /* ── FAB CENTER ICON SWAP ANIMATION ──────────────────────── */
 /* Triggered by key={currentPath} — re-mounts on every route change */
 

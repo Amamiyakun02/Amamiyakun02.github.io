@@ -11,6 +11,18 @@ type Props = {
 
 const PAGE_FLOW = ["/", "/about", "/projects", "/assistant", "/contact"]
 
+// Config for each page: icon factory + label
+const PAGE_CONFIG: Record<string, {
+  icon: (size: number) => React.ReactNode
+  label: { en: string; id: string }
+}> = {
+  '/':          { icon: (s) => <Home size={s} />,      label: { en: 'Home',    id: 'Beranda' } },
+  '/about':     { icon: (s) => <User size={s} />,      label: { en: 'About',   id: 'Tentang' } },
+  '/projects':  { icon: (s) => <Briefcase size={s} />, label: { en: 'Work',    id: 'Proyek'  } },
+  '/assistant': { icon: (s) => <Bot size={s} />,       label: { en: 'AI',      id: 'AI'      } },
+  '/contact':   { icon: (s) => <Mail size={s} />,      label: { en: 'Contact', id: 'Kontak'  } },
+}
+
 const MainLayout = ({ children }: Props) => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -120,37 +132,34 @@ const MainLayout = ({ children }: Props) => {
     }`
   }
 
-  // Arc navbar toggle state
+  // ── ARC NAVBAR STATE ────────────────────────────────────────
   const [isArcOpen, setIsArcOpen] = useState(false)
+  // Path of the satellite item currently being "selected" (for flash animation)
+  const [selectingPath, setSelectingPath] = useState<string | null>(null)
 
-  // Auto-close arc when navigating
-  useEffect(() => {
-    setIsArcOpen(false)
-  }, [currentPath])
+  // NOTE: NO auto-close on route change — menu stays open while navigating.
+  // Only handleFabClick closes the menu.
 
-  // FAB: ONLY toggles open/close — never refreshes or navigates
+  // FAB = pure open/close toggle, never navigates
   const handleFabClick = () => {
     setIsArcOpen(prev => !prev)
   }
 
-  // Satellite item click: navigate + close arc
+  // Satellite click: flash animation → navigate (menu stays open)
   const handleSatelliteClick = (path: string) => {
-    setIsArcOpen(false)
-    navigate(path)
+    if (selectingPath) return // debounce rapid taps
+    setSelectingPath(path)
+    setTimeout(() => {
+      navigate(path)
+      setSelectingPath(null)
+    }, 180)
   }
 
-  // Returns the icon for the currently active page (shown in center FAB)
-  const getCurrentPageIcon = (size = 22) => {
-    switch (currentPath) {
-      case '/about':     return <User size={size} />
-      case '/projects':  return <Briefcase size={size} />
-      case '/assistant': return <Bot size={size} />
-      case '/contact':   return <Mail size={size} />
-      default:           return <Home size={size} />
-    }
-  }
+  // Satellite pages = all pages in hierarchy order EXCEPT current page
+  // These map 1:1 to arc positions: [left-far, left-near, right-near, right-far]
+  const satellitePages = PAGE_FLOW.filter(p => p !== currentPath)
 
-  // Helper for mobile arc satellite items
+  // Helper for satellite item base classes
   const getArcNavClass = (path: string) => {
     const isActive = currentPath === path
     return `arc-nav-item flex flex-col items-center justify-center w-10 h-10 rounded-full border transition-colors duration-200 active:scale-90 ${
@@ -306,69 +315,58 @@ const MainLayout = ({ children }: Props) => {
 
         </div>
 
-        {/* 4a. Mobile Arc Navbar — toggle only, icon follows active page */}
+        {/* 4a. Mobile Arc Navbar — menu stays open across navigation, only FAB toggles */}
         <div className="arc-navbar-mobile lg:hidden">
 
-          {/* About — far left */}
-          <button
-            onClick={() => handleSatelliteClick("/about")}
-            className={getArcNavClass("/about") + " arc-item-1" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
-            style={{ transitionDelay: isArcOpen ? '0.07s' : '0s' }}
-            title={language === "en" ? "About" : "Tentang"}
-          >
-            <User size={15} />
-            <span className="text-[7px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "About" : "Tentang"}</span>
-          </button>
+          {/* Satellite items — always the 4 pages NOT currently active, in hierarchy order */}
+          {satellitePages.map((path, idx) => {
+            const arcPos = `arc-item-${idx + 1}` as const
+            const cfg = PAGE_CONFIG[path]
+            const isSelecting = selectingPath === path
+            return (
+              <button
+                key={`${idx}-${path}`}  // key includes index so re-animates when content at position changes
+                onClick={() => handleSatelliteClick(path)}
+                className={[
+                  getArcNavClass(path),
+                  arcPos,
+                  'arc-satellite-enter',                          // always plays entry animation on mount
+                  isArcOpen ? 'arc-item-visible' : 'arc-item-hidden',
+                  isSelecting ? 'arc-item-selecting' : '',
+                ].join(' ')}
+                style={{
+                  transitionDelay: isArcOpen
+                    ? (idx === 0 || idx === 3 ? '0.07s' : '0.03s') // stagger: outer items delayed
+                    : '0s',
+                }}
+                title={cfg.label[language as 'en' | 'id'] ?? cfg.label.en}
+              >
+                {cfg.icon(15)}
+                <span className="text-[7px] font-bold mt-0.5 leading-none tracking-tight">
+                  {cfg.label[language as 'en' | 'id'] ?? cfg.label.en}
+                </span>
+              </button>
+            )
+          })}
 
-          {/* Projects — inner left */}
-          <button
-            onClick={() => handleSatelliteClick("/projects")}
-            className={getArcNavClass("/projects") + " arc-item-2" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
-            style={{ transitionDelay: isArcOpen ? '0.035s' : '0.035s' }}
-            title={language === "en" ? "Projects" : "Proyek"}
-          >
-            <Briefcase size={15} />
-            <span className="text-[7px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "Work" : "Proyek"}</span>
-          </button>
-
-          {/* Assistant — inner right */}
-          <button
-            onClick={() => handleSatelliteClick("/assistant")}
-            className={getArcNavClass("/assistant") + " arc-item-3" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
-            style={{ transitionDelay: isArcOpen ? '0.035s' : '0.035s' }}
-            title={language === "en" ? "Assistant" : "Asisten"}
-          >
-            <Bot size={15} />
-            <span className="text-[7px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "AI" : "AI"}</span>
-          </button>
-
-          {/* Contact — far right */}
-          <button
-            onClick={() => handleSatelliteClick("/contact")}
-            className={getArcNavClass("/contact") + " arc-item-4" + (isArcOpen ? " arc-item-visible" : " arc-item-hidden")}
-            style={{ transitionDelay: isArcOpen ? '0.07s' : '0s' }}
-            title={language === "en" ? "Contact" : "Kontak"}
-          >
-            <Mail size={15} />
-            <span className="text-[7px] font-bold mt-0.5 leading-none tracking-tight">{language === "en" ? "Contact" : "Kontak"}</span>
-          </button>
-
-          {/* CENTER FAB — only toggles open/close, icon = current active page */}
+          {/* CENTER FAB — pure toggle, icon = current active page, animates on route change */}
           <button
             onClick={handleFabClick}
             className={`arc-home-btn flex items-center justify-center w-14 h-14 rounded-full border-2 overflow-hidden
               bg-blue-600 border-blue-500/60 text-white shadow-2xl shadow-blue-500/40
               transition-transform duration-300 active:scale-90`}
-            title={isArcOpen ? (language === "en" ? "Close Menu" : "Tutup Menu") : (language === "en" ? "Open Menu" : "Buka Menu")}
+            title={isArcOpen
+              ? (language === "en" ? "Close Menu" : "Tutup Menu")
+              : (language === "en" ? "Open Menu" : "Buka Menu")}
           >
-            {/* Icon animates slide left/right based on navigation direction */}
+            {/* key={currentPath} forces re-mount on route change → triggers slide animation */}
             <span
               key={currentPath}
               className={`fab-icon-anim ${
                 direction === 'forward' ? 'fab-icon-from-right' : 'fab-icon-from-left'
               }`}
             >
-              {getCurrentPageIcon(22)}
+              {PAGE_CONFIG[currentPath]?.icon(22) ?? <Home size={22} />}
             </span>
           </button>
         </div>
