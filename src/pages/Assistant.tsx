@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Bot, Send, User, Sparkles, ChevronUp } from "lucide-react"
+import { Bot, Send, User, Sparkles, ChevronUp, Trash2 } from "lucide-react"
 import { useApp } from "../context/AppContext"
 import avatarRobin from "../assets/images/robin.jpg"
 
@@ -157,7 +157,11 @@ const GeminiLogo = ({ className = "w-3.5 h-3.5", isActive = false }: { className
 const Assistant = () => {
   const { t, language } = useApp()
 
-  const [selectedModel, setSelectedModel] = useState<"openai" | "gemini">("openai")
+  const [selectedModel, setSelectedModel] = useState<"openai" | "gemini">(() => {
+    const saved = localStorage.getItem("assistant_selected_model")
+    return (saved === "openai" || saved === "gemini") ? saved : "openai"
+  })
+  
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState("")
   const [isTyping, setIsTyping] = useState(false)
@@ -185,21 +189,71 @@ const Assistant = () => {
     return id
   })
 
-  // Initialize welcome message when language or selectedModel changes
+  // Load saved chat history or initialize welcome message when language or selectedModel changes
   useEffect(() => {
-    const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.5";
-    const welcomeText = language === "en"
-      ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
-      : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`;
+    const saved = localStorage.getItem(`assistant_chat_history_${selectedModel}`)
+    
+    if (saved) {
+      const parsed = JSON.parse(saved) as Message[]
+      // If we have history, load it.
+      // But if the history only contains 1 welcome message from AI, we can regenerate it in the correct language!
+      if (parsed.length === 1 && parsed[0].sender === "ai") {
+        const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.5"
+        const welcomeText = language === "en"
+          ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
+          : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
+        
+        const newWelcomeMsg: Message = {
+          sender: "ai",
+          text: welcomeText,
+          timestamp: parsed[0].timestamp // keep original timestamp
+        }
+        setMessages([newWelcomeMsg])
+        localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify([newWelcomeMsg]))
+      } else {
+        setMessages(parsed)
+      }
+    } else {
+      const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.5"
+      const welcomeText = language === "en"
+        ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
+        : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
 
-    setMessages([
-      {
+      const initialMsg: Message = {
         sender: "ai",
         text: welcomeText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }
-    ])
+      setMessages([initialMsg])
+      localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify([initialMsg]))
+    }
+    
+    // Save selected model preference
+    localStorage.setItem("assistant_selected_model", selectedModel)
   }, [language, selectedModel])
+
+  const handleClearChat = () => {
+    const confirmMessage = language === "en"
+      ? "Are you sure you want to clear the conversation history?"
+      : "Apakah Anda yakin ingin menghapus riwayat percakapan?";
+    
+    if (window.confirm(confirmMessage)) {
+      localStorage.removeItem(`assistant_chat_history_${selectedModel}`)
+      
+      const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.5";
+      const welcomeText = language === "en"
+        ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
+        : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`;
+
+      const initialMsg: Message = {
+        sender: "ai",
+        text: welcomeText,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }
+      setMessages([initialMsg])
+      localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify([initialMsg]))
+    }
+  }
 
   useEffect(() => {
     if (chatLogRef.current) {
@@ -207,18 +261,17 @@ const Assistant = () => {
     }
   }, [messages, isTyping])
 
-  const triggerAIResponse = async (userQuery: string) => {
+  const triggerAIResponse = async (userQuery: string, currentMessages: Message[]) => {
     setIsTyping(true)
+    let aiMessageId = ""
+    let streamedText = ""
 
     try {
       // Map complete message history (excluding welcome message at index 0 to guarantee starting with "user" role)
-      const apiMessages = [
-        ...messages.slice(1).map(msg => ({
-          role: msg.sender === "user" ? "user" : "assistant",
-          content: msg.text
-        })),
-        { role: "user", content: userQuery }
-      ]
+      const apiMessages = currentMessages.slice(1).map(msg => ({
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.text
+      }))
 
       const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
       const baseUrl = isLocalhost ? "http://127.0.0.1:8000" : "https://myagentic-apps.fastapicloud.dev";
@@ -249,10 +302,8 @@ const Assistant = () => {
 
       const decoder = new TextDecoder()
       let done = false
-      let streamedText = ""
       let buffer = ""
       let isFirstChunk = true
-      let aiMessageId = ""
 
       while (!done) {
         const { value, done: doneReading } = await reader.read()
@@ -268,19 +319,32 @@ const Assistant = () => {
               // Plain JSON response fallback (e.g. immediate error or JSON payload)
               try {
                 const data = JSON.parse(trimmed)
+                
+                if (data.error) {
+                  throw new Error(data.error)
+                }
+
                 const responseText = data.response || data.text || data.reply || data.message || JSON.stringify(data)
 
-                setMessages(prev => [
-                  ...prev,
-                  {
-                    sender: "ai",
-                    text: responseText,
-                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                  }
-                ])
+                setMessages(prev => {
+                  const finalMessages = [
+                    ...prev,
+                    {
+                      sender: "ai",
+                      text: responseText,
+                      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    }
+                  ]
+                  localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify(finalMessages))
+                  return finalMessages
+                })
                 setIsTyping(false)
                 return
               } catch (e) {
+                // If it was a real thrown error from data.error, rethrow it
+                if (e instanceof Error && e.message && !e.message.startsWith("Unexpected token")) {
+                  throw e
+                }
                 // Not complete JSON yet, continue to stream parsing
               }
             }
@@ -314,6 +378,11 @@ const Assistant = () => {
                     break
                   }
                   const parsed = JSON.parse(jsonStr)
+                  
+                  if (parsed.error) {
+                    throw new Error(parsed.error)
+                  }
+
                   if (parsed.text) {
                     streamedText += parsed.text
                     // Push live update to corresponding message bubble
@@ -325,7 +394,10 @@ const Assistant = () => {
                   }
                 }
               } catch (e) {
-                // Ignore split chunks
+                // Rethrow stream errors to catch block to handle it correctly
+                if (e instanceof Error && e.message && !e.message.startsWith("Unexpected token")) {
+                  throw e
+                }
               }
             }
           }
@@ -338,6 +410,11 @@ const Assistant = () => {
           const jsonStr = buffer.trim().substring(6).trim()
           if (jsonStr && jsonStr !== "[DONE]") {
             const parsed = JSON.parse(jsonStr)
+            
+            if (parsed.error) {
+              throw new Error(parsed.error)
+            }
+
             if (parsed.text) {
               streamedText += parsed.text
               setMessages(prev =>
@@ -347,23 +424,53 @@ const Assistant = () => {
               )
             }
           }
-        } catch (e) { }
+        } catch (e) {
+          if (e instanceof Error && e.message && !e.message.startsWith("Unexpected token")) {
+            throw e
+          }
+        }
       }
+
+      // Persist the final completed stream history to localStorage
+      if (aiMessageId && streamedText) {
+        setMessages(prev => {
+          const finalMessages = prev.map(msg =>
+            msg.id === aiMessageId ? { ...msg, text: streamedText } : msg
+          )
+          localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify(finalMessages))
+          return finalMessages
+        })
+      }
+
     } catch (error) {
       console.error("AI response error:", error)
       const assistantName = selectedModel === "openai" ? "Robin" : "Luna"
+      const rawErrorMsg = error instanceof Error ? error.message : String(error)
+      const isSystemError = rawErrorMsg.includes("Server communication failed") || rawErrorMsg.includes("Response body is not readable") || rawErrorMsg.includes("failed to fetch")
+      
       const errorText = language === "en"
-        ? `Apologies, I encountered an issue establishing a secure link with ${assistantName}'s server terminal. Please verify your connection or try again.`
-        : `Mohon maaf, saya mengalami kegagalan transmisi data dengan terminal server ${assistantName}. Silakan periksa koneksi Anda atau coba lagi.`
+        ? (isSystemError ? `Apologies, I encountered an issue establishing a secure link with ${assistantName}'s server terminal. Please verify your connection or try again.` : `Error: ${rawErrorMsg}`)
+        : (isSystemError ? `Mohon maaf, saya mengalami kegagalan transmisi data dengan terminal server ${assistantName}. Silakan periksa koneksi Anda atau coba lagi.` : `Error: ${rawErrorMsg}`)
 
-      setMessages(prev => [
-        ...prev,
-        {
-          sender: "ai",
-          text: errorText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      setMessages(prev => {
+        let finalMessages: Message[]
+        if (aiMessageId) {
+          finalMessages = prev.map(msg =>
+            msg.id === aiMessageId ? { ...msg, text: errorText } : msg
+          )
+        } else {
+          finalMessages = [
+            ...prev,
+            {
+              sender: "ai",
+              text: errorText,
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }
+          ]
         }
-      ])
+        localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify(finalMessages))
+        return finalMessages
+      })
     } finally {
       setIsTyping(false)
     }
@@ -381,9 +488,11 @@ const Assistant = () => {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
 
-    setMessages(prev => [...prev, userMsg])
+    const updatedMessages = [...messages, userMsg]
+    setMessages(updatedMessages)
+    localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify(updatedMessages))
     setInputText("")
-    triggerAIResponse(text)
+    triggerAIResponse(text, updatedMessages)
   }
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -392,8 +501,11 @@ const Assistant = () => {
       text: suggestion,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
-    setMessages(prev => [...prev, userMsg])
-    triggerAIResponse(suggestion)
+    
+    const updatedMessages = [...messages, userMsg]
+    setMessages(updatedMessages)
+    localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify(updatedMessages))
+    triggerAIResponse(suggestion, updatedMessages)
   }
 
   // Helper to render markdown bullets/links in simple form
@@ -510,7 +622,7 @@ const Assistant = () => {
   }
 
   return (
-    <div className="w-full flex-1 min-h-0 flex flex-col justify-between items-stretch p-4 pb-36 lg:pb-4 md:p-6 text-slate-100">
+    <div className="w-full flex-1 min-h-0 flex flex-col justify-between items-stretch p-3 pb-28 pt-2 md:p-6 text-slate-100">
       {/* Sleek Compact Header */}
       <div className="animate-fade-in flex-shrink-0 flex items-center justify-between border-b border-white/[0.04] pb-3 mb-2">
         <div className="flex items-center gap-2.5">
@@ -526,6 +638,17 @@ const Assistant = () => {
             </p>
           </div>
         </div>
+        
+        {/* Clear Chat Button */}
+        <button
+          type="button"
+          onClick={handleClearChat}
+          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-rose-400 bg-slate-900/40 border border-white/[0.04] hover:border-rose-500/25 hover:bg-rose-500/5 transition-all duration-200 flex items-center gap-1.5 active:scale-95 cursor-pointer"
+          title={language === "en" ? "Clear conversation history" : "Hapus riwayat percakapan"}
+        >
+          <Trash2 size={12} />
+          <span className="hidden sm:inline">{language === "en" ? "Clear Chat" : "Hapus Chat"}</span>
+        </button>
       </div>
 
       {/* Chat Area - Expanded to occupy 100% dynamic height! */}
@@ -595,19 +718,21 @@ const Assistant = () => {
 
       {/* Suggested Prompts & Input */}
       <div className="space-y-3 flex-shrink-0">
-        {/* Suggestion Chips - Horizontal scrollable single row to save vertical space! */}
-        <div className="flex overflow-x-auto no-scrollbar gap-2 pb-1 select-none flex-nowrap w-full">
-          {suggestions[selectedModel][language].map((sug, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleSuggestionClick(sug)}
-              className="text-[11px] md:text-xs font-semibold text-slate-400 hover:text-white bg-slate-900/40 border border-white/[0.04] hover:border-blue-500/35 hover:bg-slate-900/60 px-3.5 py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 flex-shrink-0"
-            >
-              <Sparkles size={11} className="text-blue-500" />
-              <span>{sug}</span>
-            </button>
-          ))}
-        </div>
+        {/* Suggestion Chips - Only show when there are no user messages to save vertical space! */}
+        {messages.filter(m => m.sender === "user").length === 0 && (
+          <div className="flex overflow-x-auto no-scrollbar gap-2 pb-1 select-none flex-nowrap w-full">
+            {suggestions[selectedModel][language].map((sug, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSuggestionClick(sug)}
+                className="text-[11px] md:text-xs font-semibold text-slate-400 hover:text-white bg-slate-900/40 border border-white/[0.04] hover:border-blue-500/35 hover:bg-slate-900/60 px-3.5 py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 flex-shrink-0"
+              >
+                <Sparkles size={11} className="text-blue-500" />
+                <span>{sug}</span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Form Input */}
         <form onSubmit={handleSendMessage} className="flex gap-2 items-center">
