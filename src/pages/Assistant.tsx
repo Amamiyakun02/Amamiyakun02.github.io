@@ -212,7 +212,7 @@ const Assistant = () => {
       // If we have history, load it.
       // But if the history only contains 1 welcome message from AI, we can regenerate it in the correct language!
       if (parsed.length === 1 && parsed[0].sender === "ai") {
-        const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.5"
+        const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.1"
         const welcomeText = language === "en"
           ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
           : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
@@ -228,7 +228,7 @@ const Assistant = () => {
         setMessages(parsed)
       }
     } else {
-      const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.5"
+      const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.1"
       const welcomeText = language === "en"
         ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
         : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
@@ -254,7 +254,7 @@ const Assistant = () => {
     if (window.confirm(confirmMessage)) {
       localStorage.removeItem(`assistant_chat_history_${selectedModel}`)
       
-      const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.5";
+      const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.1";
       const welcomeText = language === "en"
         ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
         : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`;
@@ -668,7 +668,7 @@ const Assistant = () => {
               {t("assistantTitle")}
             </h1>
             <p className="text-[10px] text-slate-400 mt-1 select-none">
-              {selectedModel === "openai" ? "Amamiya's Personal AI Assistant (OpenAI Edition)" : "Amamiya's Personal AI Assistant (Gemini-3.5 Edition)"}
+              {selectedModel === "openai" ? "Amamiya's Personal AI Assistant (OpenAI Edition)" : "Amamiya's Personal AI Assistant (Gemini-3.1 Edition)"}
             </p>
           </div>
         </div>
@@ -799,7 +799,7 @@ const Assistant = () => {
               ) : (
                 <GeminiLogo className="w-3.5 h-3.5 animate-pulse" isActive={true} />
               )}
-              <span className="hidden sm:inline">{selectedModel === "openai" ? "OpenAI" : "Gemini-3.5"}</span>
+              <span className="hidden sm:inline">{selectedModel === "openai" ? "OpenAI" : "Gemini-3.1"}</span>
               <ChevronUp size={12} className={`transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
             </button>
 
@@ -842,7 +842,7 @@ const Assistant = () => {
                   }`}
                 >
                   <GeminiLogo className="w-3.5 h-3.5" isActive={selectedModel === "gemini"} />
-                  <span>Gemini-3.5</span>
+                  <span>Gemini-3.1</span>
                 </button>
               </div>
             )}
