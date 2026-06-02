@@ -226,7 +226,7 @@ const MainLayout = ({ children }: Props) => {
           <Sidebar isOpen={isSidebarOpen} />
 
           {/* Right Side: Page Content Wrapper */}
-          <div className={`flex-1 min-h-0 flex flex-col justify-between overflow-y-hidden relative ${
+          <div className={`flex-1 min-h-0 min-w-0 flex flex-col justify-between overflow-y-hidden relative ${
             theme === "light" ? "bg-slate-50/10" : "bg-slate-950/20"
           }`}>
             
@@ -289,7 +289,7 @@ const MainLayout = ({ children }: Props) => {
             >
               <div
                 key={currentPath}
-                className={`w-full flex-1 min-h-0 flex flex-col justify-stretch items-stretch ${
+                className={`w-full flex-1 min-h-0 min-w-0 flex flex-col justify-stretch items-stretch ${
                   transitionStyle === "slide"
                     ? direction === "forward"
                       ? "animate-slide-forward"

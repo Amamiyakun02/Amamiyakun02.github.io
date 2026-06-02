@@ -52,7 +52,7 @@ const escapeHtml = (text: string) => {
     .replace(/'/g, "&#039;");
 };
 
-const highlightCode = (code: string, lang: string): string => {
+const highlightCode = (code: string, lang: string, isDark: boolean): string => {
   const escaped = escapeHtml(code);
   const l = lang.toLowerCase().trim();
   let highlighted = escaped;
@@ -91,7 +91,9 @@ const highlightCode = (code: string, lang: string): string => {
 
   // Keyword highlighting
   const keywordRegex = new RegExp(`\\b(${keywords.join("|")})\\b`, "g");
-  highlighted = highlighted.replace(keywordRegex, '<span style="color: #ff79c6; font-weight: bold;">$1</span>');
+  highlighted = highlighted.replace(keywordRegex, isDark
+    ? '<span style="color: #ff79c6; font-weight: bold;">$1</span>'
+    : '<span style="color: #d73a49; font-weight: bold;">$1</span>');
 
   // 4. Built-in types and values
   const typesMap: Record<string, string[]> = {
@@ -105,35 +107,47 @@ const highlightCode = (code: string, lang: string): string => {
   const defaultTypes = ["true", "false", "null", "undefined", "string", "number", "boolean", "void", "any", "nil", "None", "self", "error", "int", "float", "bool"];
   const types = typesMap[lookupLang] || defaultTypes;
   const typeRegex = new RegExp(`\\b(${types.join("|")})\\b`, "g");
-  highlighted = highlighted.replace(typeRegex, '<span style="color: #bd93f9;">$1</span>');
+  highlighted = highlighted.replace(typeRegex, isDark
+    ? '<span style="color: #bd93f9;">$1</span>'
+    : '<span style="color: #005cc5;">$1</span>');
 
   // 5. Functions
-  highlighted = highlighted.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, '<span style="color: #50fa7b;">$1</span>');
+  highlighted = highlighted.replace(/\b([a-zA-Z_]\w*)\s*(?=\()/g, isDark
+    ? '<span style="color: #50fa7b;">$1</span>'
+    : '<span style="color: #6f42c1;">$1</span>');
 
   // 6. Numbers
-  highlighted = highlighted.replace(/\b(\d+(\.\d+)?)\b/g, '<span style="color: #ffb86c;">$1</span>');
+  highlighted = highlighted.replace(/\b(\d+(\.\d+)?)\b/g, isDark
+    ? '<span style="color: #ffb86c;">$1</span>'
+    : '<span style="color: #e36209;">$1</span>');
 
   // Restore strings
   strings.forEach((str, idx) => {
-    highlighted = highlighted.replace(`___STRING_TOKEN_${idx}___`, `<span style="color: #f1fa8c;">${str}</span>`);
+    highlighted = highlighted.replace(`___STRING_TOKEN_${idx}___`, isDark
+      ? `<span style="color: #f1fa8c;">${str}</span>`
+      : `<span style="color: #032f62;">${str}</span>`);
   });
 
   // Restore comments
   comments.forEach((comment, idx) => {
-    highlighted = highlighted.replace(`___COMMENT_TOKEN_${idx}___`, `<span style="color: #6272a4; font-style: italic;">${comment}</span>`);
+    highlighted = highlighted.replace(`___COMMENT_TOKEN_${idx}___`, isDark
+      ? `<span style="color: #6272a4; font-style: italic;">${comment}</span>`
+      : `<span style="color: #6a737d; font-style: italic;">${comment}</span>`);
   });
 
   return highlighted;
 };
 
 
-const OpenAILogo = ({ className = "w-3.5 h-3.5", isActive = false }: { className?: string, isActive?: boolean }) => {
+const OpenAILogo = ({ className = "w-3.5 h-3.5", isActive = false, theme = "dark" }: { className?: string, isActive?: boolean, theme?: string }) => {
   return (
     <img
       src="/openai.svg"
       className={`${className} object-contain transition-all duration-200 ${isActive
         ? "brightness-0 invert opacity-100"
-        : "brightness-0 invert opacity-60 hover:opacity-100"
+        : theme === "light"
+          ? "opacity-60 hover:opacity-100"
+          : "brightness-0 invert opacity-60 hover:opacity-100"
         }`}
       alt="OpenAI"
     />
@@ -155,7 +169,7 @@ const GeminiLogo = ({ className = "w-3.5 h-3.5", isActive = false }: { className
 
 
 const Assistant = () => {
-  const { t, language } = useApp()
+  const { t, language, theme } = useApp()
 
   const [selectedModel, setSelectedModel] = useState<"openai" | "gemini">(() => {
     const saved = localStorage.getItem("assistant_selected_model")
@@ -583,14 +597,22 @@ const Assistant = () => {
         const firstLine = lines[0].trim()
 
         // Dynamically match any alphanumeric language identifier (e.g. js, go, cpp, rust)
-        const language = /^[a-zA-Z0-9#+-]+$/.test(firstLine) ? firstLine : ""
-        const code = language ? lines.slice(1).join("\n").trim() : part.trim()
+        const codeLang = /^[a-zA-Z0-9#+-]+$/.test(firstLine) ? firstLine : ""
+        const code = codeLang ? lines.slice(1).join("\n").trim() : part.trim()
 
         return (
-          <div key={index} className="my-3 rounded-xl overflow-hidden border border-white/10 bg-[#282a36] font-mono shadow-2xl flex flex-col items-stretch max-w-full glass-card select-text">
+          <div key={index} className={`my-3 rounded-xl overflow-hidden border font-mono shadow-md flex flex-col items-stretch max-w-full select-text transition-colors duration-300 ${
+            theme === "light"
+              ? "bg-[#f6f8fa] border-slate-200 text-slate-800"
+              : "bg-[#282a36] border-white/10 text-slate-300"
+          }`}>
             {/* Header console bar */}
-            <div className="flex items-center justify-between px-4 py-2 bg-slate-900/60 border-b border-white/[0.04] text-[10px] uppercase font-bold tracking-wider text-slate-400 select-none flex-shrink-0">
-              <span className="text-cyan-400">{language || "code"}</span>
+            <div className={`flex items-center justify-between px-4 py-2 text-[10px] uppercase font-bold tracking-wider select-none flex-shrink-0 border-b transition-colors duration-300 ${
+              theme === "light"
+                ? "bg-slate-100 border-slate-200 text-slate-500"
+                : "bg-slate-900/60 border-white/[0.04] text-slate-400"
+            }`}>
+              <span className={theme === "light" ? "text-blue-600 font-bold" : "text-cyan-400"}>{codeLang || "code"}</span>
               <button
                 type="button"
                 onClick={(e) => {
@@ -598,14 +620,20 @@ const Assistant = () => {
                   navigator.clipboard.writeText(code)
                   alert(language === "id" ? "Kode berhasil disalin!" : "Code copied to clipboard!")
                 }}
-                className="text-slate-400 hover:text-white px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700/80 rounded border border-white/5 transition duration-150 active:scale-95 text-[9px] font-bold uppercase tracking-wider"
+                className={`px-2.5 py-1 rounded border text-[9px] font-bold uppercase tracking-wider transition duration-150 active:scale-95 cursor-pointer ${
+                  theme === "light"
+                    ? "bg-slate-200/80 hover:bg-slate-300/80 text-slate-600 border-slate-300/50 hover:text-slate-950"
+                    : "bg-slate-800/80 hover:bg-slate-700/80 text-slate-400 hover:text-white border-white/5"
+                }`}
               >
                 Copy
               </button>
             </div>
             {/* Syntax-highlight styled container */}
-            <pre className="p-4 text-xs overflow-x-auto scrollbar-thin leading-relaxed text-slate-300">
-              <code dangerouslySetInnerHTML={{ __html: highlightCode(code, language) }} />
+            <pre className={`p-4 text-xs overflow-x-auto scrollbar-thin leading-relaxed ${
+              theme === "light" ? "text-slate-800" : "text-slate-300"
+            }`}>
+              <code dangerouslySetInnerHTML={{ __html: highlightCode(code, codeLang, theme !== "light") }} />
             </pre>
           </div>
         )
@@ -620,11 +648,19 @@ const Assistant = () => {
   }
 
   return (
-    <div className="w-full flex-1 min-h-0 flex flex-col justify-between items-stretch p-3 pb-28 pt-2 md:p-6 text-slate-100">
+    <div className={`w-full flex-1 min-h-0 min-w-0 flex flex-col justify-between items-stretch p-3 pb-28 pt-2 md:p-6 ${
+      theme === "light" ? "text-slate-800" : "text-slate-100"
+    }`}>
       {/* Sleek Compact Header */}
-      <div className="animate-fade-in flex-shrink-0 flex items-center justify-between border-b border-white/[0.04] pb-3 mb-2">
+      <div className={`animate-fade-in flex-shrink-0 flex items-center justify-between border-b pb-3 mb-2 transition-colors duration-300 ${
+        theme === "light" ? "border-slate-200" : "border-white/[0.04]"
+      }`}>
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          <div className={`p-2 rounded-xl border transition-colors duration-300 ${
+            theme === "light"
+              ? "bg-blue-50 text-blue-600 border-blue-200"
+              : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+          }`}>
             <Bot size={20} />
           </div>
           <div>
@@ -641,7 +677,11 @@ const Assistant = () => {
         <button
           type="button"
           onClick={handleClearChat}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-rose-400 bg-slate-900/40 border border-white/[0.04] hover:border-rose-500/25 hover:bg-rose-500/5 transition-all duration-200 flex items-center gap-1.5 active:scale-95 cursor-pointer"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 active:scale-95 cursor-pointer ${
+            theme === "light"
+              ? "bg-slate-100 hover:bg-rose-50 border border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-200"
+              : "bg-slate-900/40 hover:bg-rose-500/5 border border-white/[0.04] text-slate-400 hover:text-rose-400 hover:border-rose-500/25"
+          }`}
           title={language === "en" ? "Clear conversation history" : "Hapus riwayat percakapan"}
         >
           <Trash2 size={12} />
@@ -650,11 +690,11 @@ const Assistant = () => {
       </div>
 
       {/* Chat Area - Expanded to occupy 100% dynamic height! */}
-      <div ref={chatLogRef} className="flex-1 my-3 bg-slate-950/40 border border-white/[0.04] rounded-2xl p-4 md:p-6 overflow-y-auto flex flex-col gap-4 no-scrollbar min-h-0">
+      <div ref={chatLogRef} className="flex-1 my-3 bg-slate-950/40 border border-white/[0.04] rounded-2xl p-4 md:p-6 overflow-y-auto flex flex-col gap-4 no-scrollbar min-h-0 min-w-0">
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            className={`flex gap-3 max-w-[85%] ${msg.sender === "user" ? "self-end flex-row-reverse" : "self-start"
+            className={`flex gap-3 max-w-[85%] min-w-0 ${msg.sender === "user" ? "self-end flex-row-reverse" : "self-start"
               }`}
           >
             {/* Avatar */}
@@ -676,7 +716,7 @@ const Assistant = () => {
             )}
 
             {/* Bubble */}
-            <div className={`rounded-2xl px-4 py-3 text-xs md:text-sm leading-relaxed shadow-sm ${msg.sender === "user"
+            <div className={`rounded-2xl px-4 py-3 text-xs md:text-sm leading-relaxed shadow-sm min-w-0 ${msg.sender === "user"
               ? "bg-blue-600 text-white rounded-tr-none"
               : "bg-slate-900/60 text-slate-300 border border-white/[0.03] rounded-tl-none"
               }`}>
@@ -723,7 +763,11 @@ const Assistant = () => {
               <button
                 key={idx}
                 onClick={() => handleSuggestionClick(sug)}
-                className="text-[11px] md:text-xs font-semibold text-slate-400 hover:text-white bg-slate-900/40 border border-white/[0.04] hover:border-blue-500/35 hover:bg-slate-900/60 px-3.5 py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 flex-shrink-0"
+                className={`text-[11px] md:text-xs font-semibold px-3.5 py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 flex-shrink-0 border cursor-pointer ${
+                  theme === "light"
+                    ? "bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200 hover:border-blue-500/45 hover:text-blue-600"
+                    : "bg-slate-900/40 hover:bg-slate-900/60 text-slate-400 hover:text-white border-white/[0.04] hover:border-blue-500/35"
+                }`}
               >
                 <Sparkles size={11} className="text-blue-500" />
                 <span>{sug}</span>
@@ -739,14 +783,19 @@ const Assistant = () => {
             <button
               type="button"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`h-11 px-2.5 sm:px-3.5 rounded-xl text-[10px] md:text-xs font-bold uppercase flex items-center gap-1.5 sm:gap-2 border transition-all duration-200 active:scale-95 cursor-pointer ${selectedModel === "openai"
-                ? "bg-blue-600/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:bg-blue-600/20"
-                : "bg-purple-600/10 border-purple-500/30 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.15)] hover:bg-purple-600/20"
-                }`}
+              className={`h-11 px-2.5 sm:px-3.5 rounded-xl text-[10px] md:text-xs font-bold uppercase flex items-center gap-1.5 sm:gap-2 border transition-all duration-200 active:scale-95 cursor-pointer ${
+                selectedModel === "openai"
+                  ? theme === "light"
+                    ? "bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100"
+                    : "bg-blue-600/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:bg-blue-600/20"
+                  : theme === "light"
+                    ? "bg-purple-50 border-purple-200 text-purple-600 hover:bg-purple-100"
+                    : "bg-purple-600/10 border-purple-500/30 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.15)] hover:bg-purple-600/20"
+              }`}
               title="Select AI Model Engine"
             >
               {selectedModel === "openai" ? (
-                <OpenAILogo className="w-3.5 h-3.5 animate-pulse" isActive={true} />
+                <OpenAILogo className="w-3.5 h-3.5 animate-pulse" isActive={true} theme={theme} />
               ) : (
                 <GeminiLogo className="w-3.5 h-3.5 animate-pulse" isActive={true} />
               )}
@@ -756,19 +805,26 @@ const Assistant = () => {
 
             {/* Dropdown Menu - Floats upward cleanly above the input bar */}
             {isDropdownOpen && (
-              <div className="absolute bottom-full mb-2 left-0 w-44 bg-slate-950/95 backdrop-blur-xl border border-white/[0.08] rounded-xl p-1 shadow-2xl z-50 animate-fade-in flex flex-col gap-0.5 shadow-blue-500/5">
+              <div className={`absolute bottom-full mb-2 left-0 w-44 backdrop-blur-xl border rounded-xl p-1 shadow-2xl z-50 animate-fade-in flex flex-col gap-0.5 ${
+                theme === "light"
+                  ? "bg-white/95 border-slate-200 shadow-slate-200/50"
+                  : "bg-slate-950/95 border-white/[0.08] shadow-blue-500/5"
+              }`}>
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedModel("openai")
                     setIsDropdownOpen(false)
                   }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition duration-150 flex items-center gap-2 cursor-pointer ${selectedModel === "openai"
-                    ? "bg-blue-600 text-white shadow-md glow-blue"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                    }`}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition duration-150 flex items-center gap-2 cursor-pointer ${
+                    selectedModel === "openai"
+                      ? "bg-blue-600 text-white shadow-md glow-blue"
+                      : theme === "light"
+                        ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}
                 >
-                  <OpenAILogo className="w-3.5 h-3.5" isActive={selectedModel === "openai"} />
+                  <OpenAILogo className="w-3.5 h-3.5" isActive={selectedModel === "openai"} theme={theme} />
                   <span>OpenAI</span>
                 </button>
                 <button
@@ -777,10 +833,13 @@ const Assistant = () => {
                     setSelectedModel("gemini")
                     setIsDropdownOpen(false)
                   }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition duration-150 flex items-center gap-2 cursor-pointer ${selectedModel === "gemini"
-                    ? "bg-purple-600 text-white shadow-md glow-purple"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                    }`}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition duration-150 flex items-center gap-2 cursor-pointer ${
+                    selectedModel === "gemini"
+                      ? "bg-purple-600 text-white shadow-md glow-purple"
+                      : theme === "light"
+                        ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}
                 >
                   <GeminiLogo className="w-3.5 h-3.5" isActive={selectedModel === "gemini"} />
                   <span>Gemini-3.5</span>
