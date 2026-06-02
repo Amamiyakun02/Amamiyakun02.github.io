@@ -261,7 +261,7 @@ const Assistant = () => {
     }
   }, [messages, isTyping])
 
-  const triggerAIResponse = async (userQuery: string, currentMessages: Message[]) => {
+  const triggerAIResponse = async (currentMessages: Message[]) => {
     setIsTyping(true)
     let aiMessageId = ""
     let streamedText = ""
@@ -327,14 +327,12 @@ const Assistant = () => {
                 const responseText = data.response || data.text || data.reply || data.message || JSON.stringify(data)
 
                 setMessages(prev => {
-                  const finalMessages = [
-                    ...prev,
-                    {
-                      sender: "ai",
-                      text: responseText,
-                      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                    }
-                  ]
+                  const newMsg: Message = {
+                    sender: "ai",
+                    text: responseText,
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  }
+                  const finalMessages = [...prev, newMsg]
                   localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify(finalMessages))
                   return finalMessages
                 })
@@ -492,7 +490,7 @@ const Assistant = () => {
     setMessages(updatedMessages)
     localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify(updatedMessages))
     setInputText("")
-    triggerAIResponse(text, updatedMessages)
+    triggerAIResponse(updatedMessages)
   }
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -505,7 +503,7 @@ const Assistant = () => {
     const updatedMessages = [...messages, userMsg]
     setMessages(updatedMessages)
     localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify(updatedMessages))
-    triggerAIResponse(suggestion, updatedMessages)
+    triggerAIResponse(updatedMessages)
   }
 
   // Helper to render markdown bullets/links in simple form
