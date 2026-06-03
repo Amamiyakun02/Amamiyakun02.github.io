@@ -694,27 +694,32 @@ const Assistant = () => {
   }
 
   return (
-    <div className={`w-full flex-1 min-h-0 min-w-0 flex flex-col justify-between items-stretch p-3 pb-28 pt-2 md:p-6 ${
+    <div className={`w-full flex-1 min-h-0 min-w-0 flex flex-col justify-between items-stretch p-3 pb-28 pt-2 lg:p-6 lg:pb-6 ${
       theme === "light" ? "text-slate-800" : "text-slate-100"
     }`}>
       {/* Sleek Compact Header */}
       <div className={`animate-fade-in flex-shrink-0 flex items-center justify-between border-b pb-3 mb-2 transition-colors duration-300 ${
         theme === "light" ? "border-slate-200" : "border-white/[0.04]"
       }`}>
-        <div className="flex items-center gap-2.5">
-          <div className={`p-2 rounded-xl border transition-colors duration-300 ${
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className={`p-1.5 sm:p-2 rounded-xl border transition-colors duration-300 ${
             theme === "light"
               ? "bg-blue-50 text-blue-600 border-blue-200"
               : "bg-blue-500/10 text-blue-400 border-blue-500/20"
           }`}>
-            <Bot size={20} />
+            <Bot size={18} className="sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h1 className="text-xl md:text-2xl font-black text-white leading-none">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-black text-white leading-none">
               {t("assistantTitle")}
             </h1>
-            <p className="text-[10px] text-slate-400 mt-1 select-none">
-              {selectedModel === "openai" ? "Amamiya's Personal AI Assistant (OpenAI Edition)" : "Amamiya's Personal AI Assistant (Gemini-3.1 Edition)"}
+            <p className="text-[10px] text-slate-400 mt-0.5 select-none line-clamp-1 sm:line-clamp-none">
+              <span className="inline sm:hidden">
+                {selectedModel === "openai" ? "Robin (OpenAI)" : "Luna (Gemini)"}
+              </span>
+              <span className="hidden sm:inline">
+                {selectedModel === "openai" ? "Amamiya's Personal AI Assistant (OpenAI Edition)" : "Amamiya's Personal AI Assistant (Gemini Edition)"}
+              </span>
             </p>
           </div>
         </div>
@@ -723,7 +728,7 @@ const Assistant = () => {
         <button
           type="button"
           onClick={handleClearChat}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 active:scale-95 cursor-pointer ${
+          className={`px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 active:scale-95 cursor-pointer ${
             theme === "light"
               ? "bg-slate-100 hover:bg-rose-50 border border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-200"
               : "bg-slate-900/40 hover:bg-rose-500/5 border border-white/[0.04] text-slate-400 hover:text-rose-400 hover:border-rose-500/25"
@@ -736,20 +741,20 @@ const Assistant = () => {
       </div>
 
       {/* Chat Area - Expanded to occupy 100% dynamic height! */}
-      <div ref={chatLogRef} className="flex-1 my-3 bg-slate-950/40 border border-white/[0.04] rounded-2xl p-4 md:p-6 overflow-y-auto flex flex-col gap-4 no-scrollbar min-h-0 min-w-0">
+      <div ref={chatLogRef} className="flex-1 my-3 bg-slate-950/40 border border-white/[0.04] rounded-2xl p-3 sm:p-4 md:p-6 overflow-y-auto flex flex-col gap-3 sm:gap-4 no-scrollbar min-h-0 min-w-0">
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            className={`flex gap-3 max-w-[85%] min-w-0 ${msg.sender === "user" ? "self-end flex-row-reverse" : "self-start"
+            className={`flex gap-2 sm:gap-3 max-w-[92%] sm:max-w-[88%] md:max-w-[80%] min-w-0 ${msg.sender === "user" ? "self-end flex-row-reverse" : "self-start"
               }`}
           >
             {/* Avatar */}
             {msg.sender === "user" ? (
-              <div className="rounded-xl flex-shrink-0 border border-blue-600/20 bg-blue-600/10 h-9 w-9 flex items-center justify-center text-blue-400 shadow-sm">
-                <User size={16} />
+              <div className="rounded-xl flex-shrink-0 border border-blue-600/20 bg-blue-600/10 h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center text-blue-400 shadow-sm">
+                <User size={14} className="sm:w-4 sm:h-4" />
               </div>
             ) : (
-              <div className={`rounded-xl flex-shrink-0 border overflow-hidden h-9 w-9 flex items-center justify-center shadow-sm transition-all duration-300 ${selectedModel === "openai"
+              <div className={`rounded-xl flex-shrink-0 border overflow-hidden h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center shadow-sm transition-all duration-300 ${selectedModel === "openai"
                 ? "border-blue-500/30 bg-slate-950 shadow-[0_0_10px_rgba(59,130,246,0.25)]"
                 : "border-purple-500/30 bg-slate-950 shadow-[0_0_10px_rgba(168,85,247,0.25)]"
                 }`}>
@@ -762,7 +767,7 @@ const Assistant = () => {
             )}
 
             {/* Bubble */}
-            <div className={`rounded-2xl px-4 py-3 text-xs md:text-sm leading-relaxed shadow-sm min-w-0 ${msg.sender === "user"
+            <div className={`rounded-2xl px-3 py-2 sm:px-4 sm:py-3 text-xs md:text-sm leading-relaxed shadow-sm min-w-0 ${msg.sender === "user"
               ? "bg-blue-600 text-white rounded-tr-none"
               : "bg-slate-900/60 text-slate-300 border border-white/[0.03] rounded-tl-none"
               }`}>
@@ -779,8 +784,8 @@ const Assistant = () => {
 
         {/* AI Typing Animation */}
         {isTyping && (
-          <div className="flex gap-3 max-w-[80%] self-start">
-            <div className={`rounded-xl border overflow-hidden h-9 w-9 flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 ${selectedModel === "openai"
+          <div className="flex gap-2 sm:gap-3 max-w-[80%] self-start">
+            <div className={`rounded-xl border overflow-hidden h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 ${selectedModel === "openai"
               ? "border-blue-500/30 bg-slate-950 shadow-[0_0_10px_rgba(59,130,246,0.25)]"
               : "border-purple-500/30 bg-slate-950 shadow-[0_0_10px_rgba(168,85,247,0.25)]"
               }`}>
@@ -790,7 +795,7 @@ const Assistant = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="rounded-2xl rounded-tl-none px-4 py-3 bg-slate-900/60 text-slate-300 border border-white/[0.03] flex items-center gap-1.5 h-9">
+            <div className="rounded-2xl rounded-tl-none px-3 py-2 bg-slate-900/60 text-slate-300 border border-white/[0.03] flex items-center gap-1.5 h-8 sm:h-9">
               <span className="w-1.5 h-1.5 bg-blue-400 rounded-full typing-dot" />
               <span className="w-1.5 h-1.5 bg-blue-400 rounded-full typing-dot" />
               <span className="w-1.5 h-1.5 bg-blue-400 rounded-full typing-dot" />
@@ -804,12 +809,12 @@ const Assistant = () => {
       <div className="space-y-3 flex-shrink-0">
         {/* Suggestion Chips - Only show when there are no user messages to save vertical space! */}
         {messages.filter(m => m.sender === "user").length === 0 && (
-          <div className="flex overflow-x-auto no-scrollbar gap-2 pb-1 select-none flex-nowrap w-full">
+          <div className="flex overflow-x-auto no-scrollbar gap-2 pb-1 px-0.5 select-none flex-nowrap w-full">
             {suggestions[selectedModel][language].map((sug, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSuggestionClick(sug)}
-                className={`text-[11px] md:text-xs font-semibold px-3.5 py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 flex-shrink-0 border cursor-pointer ${
+                className={`text-[10px] sm:text-[11px] md:text-xs font-semibold px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 flex-shrink-0 border cursor-pointer ${
                   theme === "light"
                     ? "bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200 hover:border-blue-500/45 hover:text-blue-600"
                     : "bg-slate-900/40 hover:bg-slate-900/60 text-slate-400 hover:text-white border-white/[0.04] hover:border-blue-500/35"
@@ -898,8 +903,8 @@ const Assistant = () => {
             type="text"
             value={inputText}
             onChange={e => setInputText(e.target.value)}
-            placeholder={language === "en" ? "Ask anything (e.g. 'skills' or 'projects')..." : "Tanyakan apa saja (misal: 'keahlian' atau 'proyek')..."}
-            className="flex-1 min-w-0 input-glass h-11"
+            placeholder={language === "en" ? "Ask anything..." : "Tanyakan sesuatu..."}
+            className="flex-1 min-w-0 input-glass h-11 px-3 sm:px-4"
           />
           <button
             type="submit"
