@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Bot, Send, User, Sparkles, ChevronUp, Trash2 } from "lucide-react"
+import { Bot, Send, User, Sparkles, ChevronUp, Trash2, Download } from "lucide-react"
 import { useApp } from "../context/AppContext"
 import avatarRobin from "../assets/images/robin.jpg"
 
@@ -521,7 +521,7 @@ const Assistant = () => {
   }
 
   // Helper to render markdown bullets/links in simple form
-  const renderMessageText = (text: string) => {
+  const renderMessageText = (text: string, isUser: boolean) => {
     return text.split('\n').map((line, i) => {
       let content: React.ReactNode = line
 
@@ -561,23 +561,69 @@ const Assistant = () => {
           </blockquote>
         )
       } else {
-        // Regular line, parse inline bold
+        // Regular line, parse inline bold and links
         const parts = line.split('**')
         content = parts.map((p, idx) => {
           if (idx % 2 === 1) {
             return <strong key={idx} className="text-white font-bold dark:text-white">{p}</strong>
           }
 
-          // Basic check for Markdown Link [text](url)
-          const linkMatch = p.match(/\[(.*?)\]\((.*?)\)/)
-          if (linkMatch) {
-            return (
-              <a key={idx} href={linkMatch[2]} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline hover:text-blue-300">
-                {linkMatch[1]}
-              </a>
-            )
+          // Robust check for Markdown Link [text](url)
+          const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+          const linkParts: React.ReactNode[] = [];
+          let lastIndex = 0;
+          let match: RegExpExecArray | null;
+          let keyCounter = 0;
+
+          while ((match = linkRegex.exec(p)) !== null) {
+            if (match.index > lastIndex) {
+              linkParts.push(<span key={keyCounter++}>{p.substring(lastIndex, match.index)}</span>);
+            }
+
+            const linkText = match[1];
+            const linkUrl = match[2];
+            const isDownload = linkText.toLowerCase().includes("download");
+
+            if (isDownload) {
+              linkParts.push(
+                <a
+                  key={keyCounter++}
+                  href={linkUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 my-1 rounded-xl font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 active:scale-95 cursor-pointer shadow-md decoration-transparent ${
+                    !isUser
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white border border-blue-600/15 shadow-blue-500/10"
+                      : "bg-white text-blue-600 hover:bg-slate-50 border border-white"
+                  }`}
+                >
+                  <Download className="w-3.5 h-3.5 shrink-0 animate-bounce" style={{ animationDuration: '2s' }} />
+                  <span>{linkText}</span>
+                </a>
+              );
+            } else {
+              linkParts.push(
+                <a
+                  key={keyCounter++}
+                  href={linkUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`underline font-bold transition-all duration-200 hover:opacity-80 ${
+                    !isUser ? "text-blue-400 hover:text-blue-300" : "text-white hover:text-slate-100"
+                  }`}
+                >
+                  {linkText}
+                </a>
+              );
+            }
+            lastIndex = match.index + match[0].length;
           }
-          return p
+
+          if (lastIndex < p.length) {
+            linkParts.push(<span key={keyCounter++}>{p.substring(lastIndex)}</span>);
+          }
+
+          return linkParts;
         })
       }
 
@@ -586,7 +632,7 @@ const Assistant = () => {
   }
 
   // Helper to parse dynamic code blocks (markdown syntax ```lang ... ```)
-  const parseMessageContent = (text: string) => {
+  const parseMessageContent = (text: string, isUser: boolean) => {
     const parts = text.split("```")
     return parts.map((part, index) => {
       const isCodeBlock = index % 2 === 1
@@ -640,7 +686,7 @@ const Assistant = () => {
       } else {
         return (
           <div key={index} className="space-y-1.5 whitespace-pre-wrap">
-            {renderMessageText(part)}
+            {renderMessageText(part, isUser)}
           </div>
         )
       }
@@ -721,7 +767,7 @@ const Assistant = () => {
               : "bg-slate-900/60 text-slate-300 border border-white/[0.03] rounded-tl-none"
               }`}>
               <div className="space-y-1.5">
-                {parseMessageContent(msg.text)}
+                {parseMessageContent(msg.text, msg.sender === "user")}
               </div>
               <div className={`text-[9px] mt-1.5 text-right select-none ${msg.sender === "user" ? "text-blue-200" : "text-slate-500"
                 }`}>
