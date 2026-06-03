@@ -569,7 +569,7 @@ const Assistant = () => {
           }
 
           // Robust check for Markdown Link [text](url)
-          const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+          const linkRegex = /\[([\s\S]*?)\]\((https?:\/\/[^\)]+)\)/g;
           const linkParts: React.ReactNode[] = [];
           let lastIndex = 0;
           let match: RegExpExecArray | null;
