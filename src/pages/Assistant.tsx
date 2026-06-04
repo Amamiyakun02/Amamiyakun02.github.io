@@ -584,28 +584,36 @@ const Assistant = () => {
             const linkUrl = match[2];
             const isDownload = linkText.toLowerCase().includes("download");
 
+            // Route Pixeldrain direct download links through backend proxy to bypass hotlinking detection
+            let finalUrl = linkUrl;
+            if (linkUrl.includes("pixeldrain.com/api/file/")) {
+              const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+              const baseUrl = isLocalhost ? "http://127.0.0.1:8000" : "https://myagentic-apps.fastapicloud.dev";
+              finalUrl = `${baseUrl}/v1/anime_downloader/proxy?url=${encodeURIComponent(linkUrl)}`;
+            }
+
             if (isDownload) {
               linkParts.push(
                 <a
                   key={keyCounter++}
-                  href={linkUrl}
+                  href={finalUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 my-1 rounded-xl font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 active:scale-95 cursor-pointer shadow-md decoration-transparent ${
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 my-1 rounded-xl font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 active:scale-95 cursor-pointer shadow-md decoration-transparent max-w-full break-words whitespace-normal ${
                     !isUser
                       ? "bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white border border-blue-600/15 shadow-blue-500/10"
                       : "bg-white text-blue-600 hover:bg-slate-50 border border-white"
                   }`}
                 >
                   <Download className="w-3.5 h-3.5 shrink-0 animate-bounce" style={{ animationDuration: '2s' }} />
-                  <span>{linkText}</span>
+                  <span className="break-all sm:break-normal text-left">{linkText}</span>
                 </a>
               );
             } else {
               linkParts.push(
                 <a
                   key={keyCounter++}
-                  href={linkUrl}
+                  href={finalUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`underline font-bold transition-all duration-200 hover:opacity-80 ${
