@@ -173,7 +173,7 @@ const Assistant = () => {
 
   const [selectedModel, setSelectedModel] = useState<"openai" | "gemini">(() => {
     const saved = localStorage.getItem("assistant_selected_model")
-    return (saved === "openai" || saved === "gemini") ? saved : "openai"
+    return (saved === "openai" || saved === "gemini") ? saved : "gemini"
   })
   
   const [messages, setMessages] = useState<Message[]>([])
