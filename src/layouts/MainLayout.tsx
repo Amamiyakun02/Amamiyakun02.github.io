@@ -32,7 +32,8 @@ const MainLayout = ({ children }: Props) => {
   })
   
   const currentPath = location.pathname
-  const currentIndex = PAGE_FLOW.indexOf(currentPath)
+  const menuPath = currentPath === "/pdf-analysis" ? "/projects" : currentPath
+  const currentIndex = PAGE_FLOW.indexOf(menuPath)
   const isAssistant = currentPath === "/assistant"
 
   const [prevIndex, setPrevIndex] = useState(currentIndex)
@@ -124,7 +125,7 @@ const MainLayout = ({ children }: Props) => {
 
   // Helper to determine active route styles (desktop pill)
   const getNavLinkClass = (path: string) => {
-    const isActive = currentPath === path
+    const isActive = menuPath === path
     return `relative p-3 rounded-full text-xs md:text-sm font-semibold transition-all duration-300 ${
       isActive
         ? "bg-blue-600 text-white shadow-md shadow-blue-500/30 scale-110"
@@ -157,11 +158,11 @@ const MainLayout = ({ children }: Props) => {
 
   // Satellite pages = all pages in hierarchy order EXCEPT current page
   // These map 1:1 to arc positions: [left-far, left-near, right-near, right-far]
-  const satellitePages = PAGE_FLOW.filter(p => p !== currentPath)
+  const satellitePages = PAGE_FLOW.filter(p => p !== menuPath)
 
   // Helper for satellite item base classes
   const getArcNavClass = (path: string) => {
-    const isActive = currentPath === path
+    const isActive = menuPath === path
     return `arc-nav-item flex flex-col items-center justify-center w-10 h-10 rounded-full border transition-colors duration-200 active:scale-90 ${
       isActive
         ? "bg-blue-600 border-blue-500/50 text-white shadow-md shadow-blue-500/30"
@@ -361,12 +362,12 @@ const MainLayout = ({ children }: Props) => {
           >
             {/* key={currentPath} forces re-mount on route change → triggers slide animation */}
             <span
-              key={currentPath}
+              key={menuPath}
               className={`fab-icon-anim ${
                 direction === 'forward' ? 'fab-icon-from-right' : 'fab-icon-from-left'
               }`}
             >
-              {PAGE_CONFIG[currentPath]?.icon(22) ?? <Home size={22} />}
+              {PAGE_CONFIG[menuPath]?.icon(22) ?? <Home size={22} />}
             </span>
           </button>
         </div>

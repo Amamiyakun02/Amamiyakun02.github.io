@@ -1,6 +1,7 @@
 import { useState } from "react"
-import { ExternalLink, Github, Bot, Layout, Smartphone, Terminal, Briefcase } from "lucide-react"
+import { ExternalLink, Github, Briefcase, FileText, Bot, ShoppingBag } from "lucide-react"
 import { useApp } from "../context/AppContext"
+import { useNavigate } from "react-router-dom"
 
 type ProjectType = {
   id: number
@@ -17,61 +18,50 @@ type ProjectType = {
 const projectsData: ProjectType[] = [
   {
     id: 1,
-    title: "Personal AI Assistant",
+    title: "PDF Analysis Tool",
     description: {
-      en: "A highly intelligent, context-aware chatbot acting as my digital clone. Capable of discussing skills, providing CV details, and answering professional inquiries dynamically in real time.",
-      id: "Obrolan cerdas berbasis konteks yang bertindak sebagai klon digital saya. Mampu mendiskusikan keahlian, memberikan detail CV, dan menjawab pertanyaan profesional secara dinamis."
+      en: "An AI-powered document analysis tool. Upload PDF files to extract structural metadata, summarize details, and analyze color distribution per page.",
+      id: "Alat analisis dokumen berbasis AI. Unggah file PDF untuk mengekstrak metadata struktural, merangkum detail, dan menganalisis sebaran warna per halaman."
     },
     category: "AI/ML",
-    tech: ["React", "TypeScript", "Tailwind CSS", "Gemini API", "LocalDB"],
-    githubUrl: "https://github.com/Amamiyakun02/PersonalAssistant",
-    liveUrl: "https://amamiyakun02.github.io/PersonalAssistant",
-    icon: Bot,
+    tech: ["React", "TypeScript", "Tailwind CSS", "FastAPI", "PyMuPDF"],
+    githubUrl: "https://github.com/Amamiyakun02/myAgentic-apps",
+    liveUrl: "/pdf-analysis",
+    icon: FileText,
     featured: true
   },
   {
     id: 2,
-    title: "Agent Dashboard",
+    title: "Agent MCP",
     description: {
-      en: "An advanced, enterprise-grade admin console for orchestrating AI agent pipelines. Features live terminal logs, mongo integration, vector database status, and knowledge graph mapping.",
-      id: "Konsol admin tingkat perusahaan yang canggih untuk mengorkestrasi jalur agen AI. Fitur logs terminal langsung, integrasi MongoDB, status basis data vektor, dan pemetaan graf pengetahuan."
+      en: "A Model Context Protocol (MCP) server integration for AI agents, allowing LLMs to securely query databases, access file systems, and execute system commands.",
+      id: "Integrasi server Model Context Protocol (MCP) untuk agen AI, memungkinkan LLM untuk menanyakan basis data, mengakses sistem berkas, dan mengeksekusi perintah sistem secara aman."
     },
-    category: "Web",
-    tech: ["Next.js", "React 19", "Tailwind CSS", "MongoDB", "Python Services"],
-    githubUrl: "https://github.com/Amamiyakun02/AgentDashboard",
-    icon: Layout,
+    category: "AI/ML",
+    tech: ["Python", "NodeJS", "MCP SDK", "AI Integration", "CLI Tools"],
+    githubUrl: "https://github.com/Amamiyakun02/AgentMCP",
+    icon: Bot,
     featured: true
   },
   {
     id: 3,
-    title: "Porto Apps",
+    title: "Lina Deals",
     description: {
-      en: "A comprehensive, high-performance cross-platform Flutter application. Integrates a suite of dev utilities, localized databases, and custom widgets designed for mobile efficiency.",
-      id: "Aplikasi seluler Flutter lintas platform yang lengkap dan berkinerja tinggi. Mengintegrasikan rangkaian utilitas pengembang, basis data lokal, dan widget kustom untuk efisiensi seluler."
+      en: "A deals aggregator and discount finder platform. Users can browse, filter, and track discount offers across e-commerce channels in real-time.",
+      id: "Platform agregator penawaran dan pencari diskon. Pengguna dapat meramban, memfilter, dan melacak penawaran diskon di berbagai saluran e-commerce secara real-time."
     },
-    category: "Mobile",
-    tech: ["Flutter", "Dart", "SQLite", "Riverpod State", "Custom Canvas"],
-    githubUrl: "https://github.com/Amamiyakun02/PortoWeb/tree/main/porto_apps",
-    icon: Smartphone,
-    featured: false
-  },
-  {
-    id: 4,
-    title: "Stargazer CLI Toolkit",
-    description: {
-      en: "A hyper-optimized set of custom bash and python command line tools built for automated system monitoring, remote server orchestration, and background worker scheduling on Linux.",
-      id: "Kumpulan alat baris perintah bash dan python kustom yang sangat dioptimalkan untuk pemantauan sistem otomatis, orkestrasi server jarak jauh, dan penjadwalan pekerja latar belakang di Linux."
-    },
-    category: "CLI",
-    tech: ["Bash", "Python", "Linux CLI", "POSIX Shell", "Cron Workers"],
-    githubUrl: "https://github.com/Amamiyakun02/StargazerCLI",
-    icon: Terminal,
-    featured: false
+    category: "Web",
+    tech: ["Next.js", "React 19", "Tailwind CSS", "Vercel", "API Integration"],
+    githubUrl: "https://github.com/Amamiyakun02/lina-deals",
+    liveUrl: "https://lina-deals.vercel.app",
+    icon: ShoppingBag,
+    featured: true
   }
 ]
 
 const Projects = () => {
   const { t, language } = useApp()
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<"All" | "AI/ML" | "Web" | "Mobile" | "CLI">("All")
 
   const filteredProjects = activeTab === "All"
@@ -128,7 +118,14 @@ const Projects = () => {
               <div
                 key={project.id}
                 style={{ animationDelay: `${idx * 0.1}s` }}
-                className="group relative flex flex-col bg-slate-900/30 border border-white/[0.04] rounded-2xl p-5 md:p-6 hover:border-blue-500/30 hover:bg-slate-900/50 hover:shadow-[0_8px_30px_rgba(59,130,246,0.08)] transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
+                onClick={() => {
+                  if (project.liveUrl && project.liveUrl.startsWith("/")) {
+                    navigate(project.liveUrl)
+                  }
+                }}
+                className={`group relative flex flex-col bg-slate-900/30 border border-white/[0.04] rounded-2xl p-5 md:p-6 hover:border-blue-500/30 hover:bg-slate-900/50 hover:shadow-[0_8px_30px_rgba(59,130,246,0.08)] transition-all duration-300 transform hover:-translate-y-1 overflow-hidden ${
+                  project.liveUrl && project.liveUrl.startsWith("/") ? "cursor-pointer" : ""
+                }`}
               >
                 {/* Accent glow on top left */}
                 <div className="absolute -top-10 -left-10 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all duration-300" />
@@ -145,21 +142,36 @@ const Projects = () => {
                       href={project.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="p-2 bg-slate-950/60 rounded-full text-slate-400 hover:text-white hover:bg-slate-950 border border-white/[0.05] transition-all"
                       title={language === "en" ? "View GitHub Repository" : "Lihat Repositori GitHub"}
                     >
                       <Github size={16} />
                     </a>
                     {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 bg-slate-950/60 rounded-full text-slate-400 hover:text-white hover:bg-slate-950 border border-white/[0.05] transition-all"
-                        title={language === "en" ? "View Live Demo" : "Lihat Demo Langsung"}
-                      >
-                        <ExternalLink size={16} />
-                      </a>
+                      project.liveUrl.startsWith("/") ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate(project.liveUrl!)
+                          }}
+                          className="p-2 bg-slate-950/60 rounded-full text-slate-400 hover:text-white hover:bg-slate-950 border border-white/[0.05] transition-all cursor-pointer"
+                          title={language === "en" ? "View Live Demo" : "Lihat Demo Langsung"}
+                        >
+                          <ExternalLink size={16} />
+                        </button>
+                      ) : (
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-2 bg-slate-950/60 rounded-full text-slate-400 hover:text-white hover:bg-slate-950 border border-white/[0.05] transition-all"
+                          title={language === "en" ? "View Live Demo" : "Lihat Demo Langsung"}
+                        >
+                          <ExternalLink size={16} />
+                        </a>
+                      )
                     )}
                   </div>
                 </div>

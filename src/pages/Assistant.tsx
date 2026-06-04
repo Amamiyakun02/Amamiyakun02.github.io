@@ -456,7 +456,7 @@ const Assistant = () => {
 
     } catch (error) {
       console.error("AI response error:", error)
-      const assistantName = selectedModel === "openai" ? "Robin" : "Luna"
+      const assistantName = "Robin"
       const rawErrorMsg = error instanceof Error ? error.message : String(error)
       const isSystemError = rawErrorMsg.includes("Server communication failed") || rawErrorMsg.includes("Response body is not readable") || rawErrorMsg.includes("failed to fetch")
       
@@ -715,7 +715,7 @@ const Assistant = () => {
             </h1>
             <p className="text-[10px] text-slate-400 mt-0.5 select-none line-clamp-1 sm:line-clamp-none">
               <span className="inline sm:hidden">
-                {selectedModel === "openai" ? "Robin (OpenAI)" : "Luna (Gemini)"}
+                {selectedModel === "openai" ? "Robin (OpenAI)" : "Robin (Gemini)"}
               </span>
               <span className="hidden sm:inline">
                 {selectedModel === "openai" ? "Amamiya's Personal AI Assistant (OpenAI Edition)" : "Amamiya's Personal AI Assistant (Gemini Edition)"}
