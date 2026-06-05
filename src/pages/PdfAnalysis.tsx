@@ -145,7 +145,98 @@ const LOCAL_TRANSLATIONS = {
   resetBtn: {
     en: "Upload Another File",
     id: "Unggah File Lain"
+  },
+  cutSectionTitle: {
+    en: "Split / Cut PDF Pages",
+    id: "Potong / Ekstrak Halaman PDF"
+  },
+  cutSectionDesc: {
+    en: "Select specific pages to extract into a new PDF document. Click individual page badges below to toggle selection, or write ranges directly.",
+    id: "Pilih halaman tertentu untuk diekstrak menjadi dokumen PDF baru. Klik badge halaman di bawah untuk memilih, atau ketik rentang secara langsung."
+  },
+  cutInputLabel: {
+    en: "Pages to Extract",
+    id: "Halaman yang Diekstrak"
+  },
+  cutInputPlaceholder: {
+    en: "e.g. 1-3, 5, 7-9",
+    id: "contoh: 1-3, 5, 7-9"
+  },
+  cutBtn: {
+    en: "Extract & Download PDF",
+    id: "Ekstrak & Unduh PDF"
+  },
+  cuttingBtn: {
+    en: "Extracting Pages...",
+    id: "Mengekstrak Halaman..."
+  },
+  selectAll: {
+    en: "Select All",
+    id: "Pilih Semua"
+  },
+  selectNone: {
+    en: "Clear Selection",
+    id: "Bersihkan Pilihan"
+  },
+  selectColored: {
+    en: "Select Colored Only",
+    id: "Pilih Hanya Berwarna"
+  },
+  selectGrayscale: {
+    en: "Select Grayscale Only",
+    id: "Pilih Hanya Grayscale"
   }
+}
+
+// Helper to convert array of page numbers (e.g. [1, 2, 3, 5, 8, 9]) to sorted range string (e.g. "1-3, 5, 8-9")
+const pageListToRangeString = (nums: number[]): string => {
+  if (nums.length === 0) return ""
+  const sorted = [...nums].sort((a, b) => a - b)
+  const ranges: string[] = []
+  let start = sorted[0]
+  let end = sorted[0]
+
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === end + 1) {
+      end = sorted[i]
+    } else {
+      ranges.push(start === end ? `${start}` : `${start}-${end}`)
+      start = sorted[i]
+      end = sorted[i]
+    }
+  }
+  ranges.push(start === end ? `${start}` : `${start}-${end}`)
+  return ranges.join(", ")
+}
+
+// Helper to convert range string (e.g. "1-3, 5") to list of unique page numbers, up to maxPages
+const rangeStringToPageList = (str: string, maxPages: number): number[] => {
+  const pages = new Set<number>()
+  const parts = str.split(",")
+  for (const part of parts) {
+    const trimmed = part.trim()
+    if (!trimmed) continue
+    if (trimmed.includes("-")) {
+      const subparts = trimmed.split("-")
+      if (subparts.length === 2) {
+        const start = parseInt(subparts[0].trim())
+        const end = parseInt(subparts[1].trim())
+        if (!isNaN(start) && !isNaN(end) && start <= end) {
+          for (let p = start; p <= end; p++) {
+            if (p >= 1 && p <= maxPages) {
+              pages.add(p)
+            }
+          }
+        }
+      }
+    } else {
+      const p = parseInt(trimmed)
+      if (!isNaN(p) && p >= 1 && p <= maxPages) {
+        pages.add(p)
+      }
+    }
+  }
+  return Array.from(pages).sort((a, b) => a - b)
 }
 
 const PdfAnalysis = () => {
@@ -162,6 +253,12 @@ const PdfAnalysis = () => {
   // Filtering page grid
   const [activeFilter, setActiveFilter] = useState<"all" | "color" | "grayscale">("all")
   const [searchQuery, setSearchQuery] = useState<string>("")
+
+  // PDF cutting states
+  const [selectedPages, setSelectedPages] = useState<number[]>([])
+  const [rangeText, setRangeText] = useState<string>("")
+  const [cutting, setCutting] = useState<boolean>(false)
+  const [cutError, setCutError] = useState<string | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -213,6 +310,10 @@ const PdfAnalysis = () => {
     setFile(null)
     setResult(null)
     setError(null)
+    setSelectedPages([])
+    setRangeText("")
+    setCutting(false)
+    setCutError(null)
   }
 
   const formatBytes = (bytes: number, decimals = 2) => {
@@ -256,6 +357,101 @@ const PdfAnalysis = () => {
       setError(err.message || (language === "en" ? "Failed to communicate with the PDF analysis service." : "Gagal terhubung dengan layanan analisis PDF."))
     } finally {
       setAnalyzing(false)
+    }
+  }
+
+  const handleTogglePage = (pageNumber: number) => {
+    setSelectedPages((prev) => {
+      const updated = prev.includes(pageNumber)
+        ? prev.filter((p) => p !== pageNumber)
+        : [...prev, pageNumber].sort((a, b) => a - b)
+      
+      setRangeText(pageListToRangeString(updated))
+      return updated
+    })
+  }
+
+  const handleRangeTextChange = (value: string) => {
+    setRangeText(value)
+    if (result) {
+      const parsed = rangeStringToPageList(value, result.total_pages)
+      setSelectedPages(parsed)
+    }
+  }
+
+  const handleSelectAll = () => {
+    if (!result) return
+    const all = Array.from({ length: result.total_pages }, (_, i) => i + 1)
+    setSelectedPages(all)
+    setRangeText(pageListToRangeString(all))
+  }
+
+  const handleSelectNone = () => {
+    setSelectedPages([])
+    setRangeText("")
+  }
+
+  const handleSelectColored = () => {
+    if (!result) return
+    const colored = result.colored_pages
+    setSelectedPages(colored)
+    setRangeText(pageListToRangeString(colored))
+  }
+
+  const handleSelectGrayscale = () => {
+    if (!result) return
+    const grayscale = result.grayscale_pages
+    setSelectedPages(grayscale)
+    setRangeText(pageListToRangeString(grayscale))
+  }
+
+  const handleCut = async () => {
+    if (!file || selectedPages.length === 0) return
+
+    setCutting(true)
+    setCutError(null)
+
+    try {
+      const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      const baseUrl = isLocalhost ? "http://127.0.0.1:8000" : "https://myagentic-apps.fastapicloud.dev"
+      const endpoint = `${baseUrl}/v1/pdf/cut`
+
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("pages", rangeText)
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}))
+        throw new Error(errData.detail || (language === "en" ? "Failed to cut PDF." : "Gagal memotong PDF."))
+      }
+
+      const blob = await response.blob()
+      const downloadUrl = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = downloadUrl
+      
+      const origName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name
+      a.download = `${origName}_cut.pdf`
+      
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(downloadUrl)
+    } catch (err: any) {
+      console.error(err)
+      setCutError(
+        err.message ||
+          (language === "en"
+            ? "Failed to connect to PDF cutting service."
+            : "Gagal terhubung dengan layanan pemotong PDF.")
+      )
+    } finally {
+      setCutting(false)
     }
   }
 
@@ -572,6 +768,67 @@ const PdfAnalysis = () => {
                 </div>
               </div>
 
+              {/* PDF Cutting Control Card */}
+              <div className="bg-slate-900/30 border border-white/[0.04] p-5 rounded-2xl space-y-4 relative overflow-hidden">
+                {/* Ambient background accent */}
+                <div className="absolute -top-10 -left-10 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
+
+                <div>
+                  <h3 className="text-xs uppercase font-extrabold tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <FileText size={13} className="text-blue-400" />
+                    <span>{tl("cutSectionTitle")}</span>
+                  </h3>
+                  <p className="text-[10px] text-slate-500 mt-1 leading-normal">
+                    {tl("cutSectionDesc")}
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 items-end">
+                  <div className="flex-1 w-full space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+                      {tl("cutInputLabel")}
+                    </label>
+                    <input
+                      type="text"
+                      value={rangeText}
+                      onChange={(e) => handleRangeTextChange(e.target.value)}
+                      placeholder={tl("cutInputPlaceholder")}
+                      disabled={cutting}
+                      className="w-full bg-slate-950/60 border border-white/5 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 transition-all font-mono"
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleCut}
+                    disabled={cutting || selectedPages.length === 0}
+                    className={`py-2 px-5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all duration-200 active:scale-95 flex items-center justify-center gap-1.5 border cursor-pointer shrink-0 w-full sm:w-auto h-[34px] ${
+                      cutting || selectedPages.length === 0
+                        ? "bg-slate-800/50 border-white/5 text-slate-500 cursor-not-allowed"
+                        : "bg-blue-600 border-blue-500/20 hover:bg-blue-500 hover:shadow-blue-500/10 text-white"
+                    }`}
+                  >
+                    {cutting ? (
+                      <>
+                        <RefreshCw size={12} className="animate-spin" />
+                        <span>{tl("cuttingBtn")}</span>
+                      </>
+                    ) : (
+                      <>
+                        <FileText size={12} />
+                        <span>{tl("cutBtn")}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {cutError && (
+                  <div className="bg-rose-500/5 border border-rose-500/20 p-3 rounded-xl flex items-start gap-2 animate-fade-in">
+                    <AlertTriangle className="text-rose-400 shrink-0 mt-0.5" size={13} />
+                    <span className="text-[10px] text-rose-400 leading-normal">{cutError}</span>
+                  </div>
+                )}
+              </div>
+
               {/* Detailed Grid of Pages */}
               <div className="bg-slate-900/30 border border-white/[0.04] p-5 rounded-2xl flex flex-col gap-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-2 border-b border-white/[0.04]">
@@ -609,18 +866,63 @@ const PdfAnalysis = () => {
                   ))}
                 </div>
 
+                {/* Selection Helper Buttons */}
+                <div className="flex flex-wrap gap-2 items-center bg-slate-950/20 border border-white/[0.03] p-2 rounded-xl">
+                  <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider px-1">
+                    {language === "en" ? "Select:" : "Pilih:"}
+                  </span>
+                  <button
+                    onClick={handleSelectAll}
+                    className="text-[9px] font-bold py-1 px-2.5 bg-slate-900 border border-white/[0.05] hover:border-slate-700 rounded transition cursor-pointer text-slate-300 hover:text-white"
+                  >
+                    {tl("selectAll")}
+                  </button>
+                  {result.colored_pages_count > 0 && (
+                    <button
+                      onClick={handleSelectColored}
+                      className="text-[9px] font-bold py-1 px-2.5 bg-blue-500/5 border border-blue-500/10 hover:border-blue-500/30 rounded transition cursor-pointer text-blue-400 hover:text-blue-300"
+                    >
+                      {tl("selectColored")}
+                    </button>
+                  )}
+                  {result.grayscale_pages_count > 0 && (
+                    <button
+                      onClick={handleSelectGrayscale}
+                      className="text-[9px] font-bold py-1 px-2.5 bg-slate-900 border border-white/[0.05] hover:border-slate-700 rounded transition cursor-pointer text-slate-300 hover:text-white"
+                    >
+                      {tl("selectGrayscale")}
+                    </button>
+                  )}
+                  {selectedPages.length > 0 && (
+                    <button
+                      onClick={handleSelectNone}
+                      className="text-[9px] font-bold py-1 px-2.5 bg-rose-500/5 border border-rose-500/10 hover:border-rose-500/30 rounded transition cursor-pointer text-rose-400 hover:text-rose-300 sm:ml-auto"
+                    >
+                      {tl("selectNone")}
+                    </button>
+                  )}
+                </div>
+
                 {/* Page badges grid */}
                 {filteredPages.length > 0 ? (
                   <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2.5 max-h-[250px] overflow-y-auto pr-1 scrollbar-thin">
                     {filteredPages.map((pageObj) => (
                       <div
                         key={pageObj.page}
-                        className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all ${
-                          pageObj.is_colored
-                            ? "bg-blue-500/5 border-blue-500/20 hover:border-blue-500/40"
+                        onClick={() => handleTogglePage(pageObj.page)}
+                        className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all cursor-pointer select-none relative overflow-hidden group/badge ${
+                          selectedPages.includes(pageObj.page)
+                            ? "border-blue-500 bg-blue-500/10 shadow-[0_0_12px_rgba(59,130,246,0.15)]"
+                            : pageObj.is_colored
+                            ? "bg-blue-500/5 border-blue-500/10 hover:border-blue-500/30"
                             : "bg-slate-950/20 border-white/[0.04] hover:border-white/10"
                         }`}
                       >
+                        {selectedPages.includes(pageObj.page) && (
+                          <div className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center text-white text-[8px] font-bold animate-scale-in">
+                            ✓
+                          </div>
+                        )}
                         <span className="text-[10px] text-slate-500 font-bold select-none uppercase tracking-wide leading-none">
                           Page
                         </span>
