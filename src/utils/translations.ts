@@ -10,8 +10,8 @@ export const translations = {
     id: "Amamiya (Maireza)"
   },
   sidebarRole: {
-    en: "A.I Engineer & Toolsmith",
-    id: "Rekayasa A.I & Toolsmith"
+    en: "AI Application & Automation Engineer",
+    id: "Insinyur Aplikasi AI & Otomatisasi"
   },
   sidebarDesc: {
     en: "Building smart scripts, RAG pipelines, and cross-platform apps. Build once, useful forever.",
@@ -36,8 +36,8 @@ export const translations = {
     id: "Halo, saya"
   },
   homeRole: {
-    en: "A.I Engineer & Toolsmith specializing in constructing smart autonomous agent pipelines, responsive full-stack applications, and robust Linux automation tools.",
-    id: "Insinyur A.I & Toolsmith yang berspesialisasi dalam membangun jaringan agen otonom cerdas, aplikasi web full-stack yang responsif, dan alat otomatisasi Linux yang kokoh."
+    en: "AI Application & Automation Engineer specializing in constructing smart autonomous agent pipelines, responsive web/mobile applications, and robust system automation tools.",
+    id: "Insinyur Aplikasi AI & Otomatisasi yang berspesialisasi dalam membangun jaringan agen otonom cerdas, aplikasi web/mobile yang responsif, dan alat otomatisasi sistem yang kokoh."
   },
   homeMaxim: {
     en: "Build once, useful forever — crafting clever little digital machines that solve repetitive struggles and stand the test of time.",
@@ -114,8 +114,8 @@ export const translations = {
     id: "2024 - Sekarang"
   },
   aboutTimeline1Title: {
-    en: "Freelance A.I Engineer & Toolsmith",
-    id: "Insinyur A.I & Toolsmith Lepas"
+    en: "Freelance AI Application & Automation Engineer",
+    id: "Insinyur Aplikasi AI & Otomatisasi Lepas"
   },
   aboutTimeline1Subtitle: {
     en: "Custom AI Architectures & Automation",

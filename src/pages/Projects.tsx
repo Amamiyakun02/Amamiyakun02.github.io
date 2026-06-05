@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ExternalLink, Github, Briefcase, FileText, Bot, ShoppingBag } from "lucide-react"
+import { ExternalLink, Github, Briefcase, FileText, Bot, ShoppingBag, Image } from "lucide-react"
 import { useApp } from "../context/AppContext"
 import { useNavigate } from "react-router-dom"
 
@@ -55,6 +55,20 @@ const projectsData: ProjectType[] = [
     githubUrl: "https://github.com/Amamiyakun02/lina-deals",
     liveUrl: "https://lina-deals.vercel.app",
     icon: ShoppingBag,
+    featured: true
+  },
+  {
+    id: 4,
+    title: "AI Background Remover",
+    description: {
+      en: "An AI-powered image background removal tool. Upload images (PNG/JPG) to automatically detect and erase backgrounds in real-time.",
+      id: "Alat penghapus background gambar berbasis AI. Unggah gambar (PNG/JPG) untuk secara otomatis mendeteksi dan menghapus background secara real-time."
+    },
+    category: "AI/ML",
+    tech: ["React", "TypeScript", "Tailwind CSS", "Hugging Face Spaces", "Bi-RefNet"],
+    githubUrl: "https://github.com/Amamiyakun02/myAgentic-apps",
+    liveUrl: "/remove-bg",
+    icon: Image,
     featured: true
   }
 ]

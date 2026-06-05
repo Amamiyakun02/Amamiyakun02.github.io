@@ -17,7 +17,7 @@ export const Other = () => {
           <h2 className="text-white text-xl font-extrabold mt-4">
             Amamiya (Maireza)
           </h2>
-          <p className="text-white text-sm font-medium mt-1">A.I Engineer</p>
+          <p className="text-white text-sm font-medium mt-1 text-center">AI Application & Automation Engineer</p>
 
           {/* Social Icons */}
           <div className="mt-8 flex gap-3">
@@ -52,7 +52,7 @@ export const Other = () => {
             Hello!, I’m Amamiya
           </div>
           <p className="text-base md:text-xl text-slate-800 mt-4 text-center">
-            A.I Engineer | Software Developer | Linux Enthusiast | Toolsmith
+            AI Application & Automation Engineer | Software Developer | Linux Enthusiast
           </p>
 
           <div className="mt-12 space-y-6 text-center max-w-2xl">

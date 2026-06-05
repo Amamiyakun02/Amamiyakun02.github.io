@@ -12,125 +12,116 @@ type Skill = {
 }
 
 const skillsData: Skill[] = [
-  { 
-    name: "Python", 
-    level: 90, 
-    desc: { 
-      en: "Primary language for model orchestrations, scripting, and data pipelines.", 
-      id: "Bahasa utama untuk orkestrasi model, pembuatan skrip, dan alur data." 
-    }, 
-    category: "AI/ML" 
+  {
+    name: "Python",
+    level: 85,
+    desc: {
+      en: "Primary language for model orchestrations, scripting, and data pipelines.",
+      id: "Bahasa utama untuk orkestrasi model, pembuatan skrip, dan alur data."
+    },
+    category: "AI/ML"
   },
-  { 
-    name: "PyTorch & ML", 
-    level: 75, 
-    desc: { 
-      en: "Model architecture exploration, fine-tuning, and vector mathematics.", 
-      id: "Eksplorasi arsitektur model, penalaan halus (fine-tuning), dan matematika vektor." 
-    }, 
-    category: "AI/ML" 
+  {
+    name: "PyTorch & ML",
+    level: 75,
+    desc: {
+      en: "Model architecture exploration, fine-tuning, and vector mathematics.",
+      id: "Eksplorasi arsitektur model, penalaan halus (fine-tuning), dan matematika vektor."
+    },
+    category: "AI/ML"
   },
-  { 
-    name: "LangChain / RAG", 
-    level: 85, 
-    desc: { 
-      en: "Building modular agent pipelines and custom knowledge retrieval indexes.", 
-      id: "Membangun alur agen modular dan indeks pengambilan pengetahuan kustom." 
-    }, 
-    category: "AI/ML" 
+  {
+    name: "LangChain / RAG",
+    level: 80,
+    desc: {
+      en: "Building modular agent pipelines and custom knowledge retrieval indexes.",
+      id: "Membangun alur agen modular dan indeks pengambilan pengetahuan kustom."
+    },
+    category: "AI/ML"
   },
-  { 
-    name: "Gemini / OpenAI SDKs", 
-    level: 90, 
-    desc: { 
-      en: "Full production integration of advanced multimodal intelligence models.", 
-      id: "Integrasi produksi penuh dari model kecerdasan multimodal canggih." 
-    }, 
-    category: "AI/ML" 
+  {
+    name: "Gemini / OpenAI SDKs",
+    level: 80,
+    desc: {
+      en: "Full production integration of advanced multimodal intelligence models.",
+      id: "Integrasi produksi penuh dari model kecerdasan multimodal canggih."
+    },
+    category: "AI/ML"
   },
-  
-  { 
-    name: "TypeScript / JS", 
-    level: 85, 
-    desc: { 
-      en: "Writing safe, performant code for modern web architectures.", 
-      id: "Menulis kode yang aman dan berkinerja tinggi untuk arsitektur web modern." 
-    }, 
-    category: "Web" 
+
+  {
+    name: "TypeScript / JS",
+    level: 75,
+    desc: {
+      en: "Writing safe, performant code for modern web architectures.",
+      id: "Menulis kode yang aman dan berkinerja tinggi untuk arsitektur web modern."
+    },
+    category: "Web"
   },
-  { 
-    name: "React & Next.js", 
-    level: 80, 
-    desc: { 
-      en: "Crafting beautiful frontends and highly reactive dashboards.", 
-      id: "Membuat frontend yang indah dan dasbor yang sangat reaktif." 
-    }, 
-    category: "Web" 
+  {
+    name: "React",
+    level: 80,
+    desc: {
+      en: "Crafting beautiful frontends and highly reactive dashboards.",
+      id: "Membuat frontend yang indah dan dasbor yang sangat reaktif."
+    },
+    category: "Web"
   },
-  { 
-    name: "Tailwind CSS", 
-    level: 90, 
-    desc: { 
-      en: "Constructing pixel-perfect, highly responsive, premium styling systems.", 
-      id: "Membangun sistem penataan gaya premium yang piksel-sempurna dan sangat responsif." 
-    }, 
-    category: "Web" 
+  {
+    name: "Tailwind CSS",
+    level: 65,
+    desc: {
+      en: "Constructing pixel-perfect, highly responsive, premium styling systems.",
+      id: "Membangun sistem penataan gaya premium yang piksel-sempurna dan sangat responsif."
+    },
+    category: "Web"
   },
-  { 
-    name: "Node.js / Express", 
-    level: 75, 
-    desc: { 
-      en: "Engineering efficient backend APIs and middleware servers.", 
-      id: "Merekayasa API backend dan server middleware yang efisien." 
-    }, 
-    category: "Web" 
+
+  {
+    name: "Linux Administration",
+    level: 70,
+    desc: {
+      en: "System configuration, resource limits management, and server administration.",
+      id: "Konfigurasi sistem, manajemen batas sumber daya, dan administrasi server."
+    },
+    category: "Systems"
   },
-  
-  { 
-    name: "Linux Administration", 
-    level: 90, 
-    desc: { 
-      en: "System configuration, resource limits management, and server administration.", 
-      id: "Konfigurasi sistem, manajemen batas sumber daya, dan administrasi server." 
-    }, 
-    category: "Systems" 
+  {
+    name: "Bash & Python Scripting",
+    level: 80,
+    desc: {
+      en: "Constructing advanced automation scripts to resolve routine struggles.",
+      id: "Membangun skrip otomatisasi tingkat lanjut untuk menyelesaikan rutinitas kerja."
+    },
+    category: "Systems"
   },
-  { 
-    name: "Bash & Python Scripting", 
-    level: 95, 
-    desc: { 
-      en: "Constructing advanced automation scripts to resolve routine struggles.", 
-      id: "Membangun skrip otomatisasi tingkat lanjut untuk menyelesaikan rutinitas kerja." 
-    }, 
-    category: "Systems" 
+  {
+    name: "Docker Containers",
+    level: 80,
+    desc: {
+      en: "Packaging systems for sandboxed, highly reproducible deployments.",
+      id: "Mengemas sistem untuk penerapan yang aman (sandboxed) dan mudah direproduksi."
+    },
+    category: "Systems"
   },
-  { 
-    name: "Docker Containers", 
-    level: 80, 
-    desc: { 
-      en: "Packaging systems for sandboxed, highly reproducible deployments.", 
-      id: "Mengemas sistem untuk penerapan yang aman (sandboxed) dan mudah direproduksi." 
-    }, 
-    category: "Systems" 
+
+  {
+    name: "Flutter & Dart",
+    level: 80,
+    desc: {
+      en: "Cross-platform mobile applications with high-fidelity canvas animations.",
+      id: "Aplikasi seluler lintas platform dengan animasi kanvas fidelitas tinggi."
+    },
+    category: "Other"
   },
-  
-  { 
-    name: "Flutter & Dart", 
-    level: 80, 
-    desc: { 
-      en: "Cross-platform mobile applications with high-fidelity canvas animations.", 
-      id: "Aplikasi seluler lintas platform dengan animasi kanvas fidelitas tinggi." 
-    }, 
-    category: "Other" 
-  },
-  { 
-    name: "SQL & MongoDB", 
-    level: 75, 
-    desc: { 
-      en: "Structuring relational and document databases for persistent storage.", 
-      id: "Menyusun basis data relasional dan dokumen untuk penyimpanan persisten." 
-    }, 
-    category: "Other" 
+  {
+    name: "SQL & MongoDB",
+    level: 75,
+    desc: {
+      en: "Structuring relational and document databases for persistent storage.",
+      id: "Menyusun basis data relasional dan dokumen untuk penyimpanan persisten."
+    },
+    category: "Other"
   }
 ]
 
@@ -165,7 +156,7 @@ const About = () => {
 
   return (
     <div className="w-full min-h-fit lg:h-full flex flex-col justify-start items-stretch p-5 md:p-10 text-slate-100">
-      
+
       {/* Header */}
       <div className="mb-8 animate-fade-in flex-shrink-0">
         <div className="flex items-center gap-3 text-blue-400 font-semibold uppercase tracking-wider text-xs md:text-sm">
@@ -188,18 +179,17 @@ const About = () => {
               <Star size={16} className="text-blue-400 animate-pulse" />
               <span>{t("aboutMatrixTitle")}</span>
             </h3>
-            
+
             {/* Category Filter */}
             <div className="flex gap-1 bg-slate-950/30 p-1 rounded-lg border border-white/[0.04]">
               {(["All", "AI/ML", "Web", "Systems"] as const).map(cat => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`text-[10px] md:text-xs font-semibold px-2.5 py-1 rounded-md transition ${
-                    activeCategory === cat
-                      ? "bg-blue-600 text-white"
-                      : "text-slate-400 hover:text-slate-200"
-                  }`}
+                  className={`text-[10px] md:text-xs font-semibold px-2.5 py-1 rounded-md transition ${activeCategory === cat
+                    ? "bg-blue-600 text-white"
+                    : "text-slate-400 hover:text-slate-200"
+                    }`}
                 >
                   {cat}
                 </button>
@@ -219,7 +209,7 @@ const About = () => {
                   </h4>
                   <span className="text-xs font-mono font-bold text-blue-400">{skill.level}%</span>
                 </div>
-                
+
                 {/* Progress Bar Container */}
                 <div className="w-full h-1.5 bg-slate-950/60 rounded-full overflow-hidden border border-white/[0.04] mb-2">
                   <div
@@ -227,7 +217,7 @@ const About = () => {
                     style={{ width: `${skill.level}%` }}
                   />
                 </div>
-                
+
                 <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
                   {skill.desc[language]}
                 </p>
@@ -258,7 +248,7 @@ const About = () => {
                 <h4 className="text-sm font-bold text-white mt-2 group-hover:text-blue-400 transition-colors">
                   {item.title}
                 </h4>
-                
+
                 <h5 className="text-[11px] font-semibold text-slate-400 mt-0.5 flex items-center gap-1">
                   <BookOpen size={10} className="text-slate-500" />
                   <span>{item.subtitle}</span>

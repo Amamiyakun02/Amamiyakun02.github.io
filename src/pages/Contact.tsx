@@ -127,13 +127,13 @@ const Contact = () => {
       if (language === "en") {
         newLines.push(
           { text: "Subject Name  : Amamiya (Maireza)", type: "system" },
-          { text: "Classification: A.I Engineer & Linux Toolsmith", type: "system" },
+          { text: "Classification: AI Application & Automation Engineer", type: "system" },
           { text: "Directive     : 'Build once, useful forever' - engineer smart scripts & AI integrations.", type: "success" }
         )
       } else {
         newLines.push(
           { text: "Nama Subjek   : Amamiya (Maireza)", type: "system" },
-          { text: "Klasifikasi   : Rekayasa A.I & Linux Toolsmith", type: "system" },
+          { text: "Klasifikasi   : Insinyur Aplikasi AI & Otomatisasi", type: "system" },
           { text: "Petunjuk Inti : 'Sekali buat, berguna selamanya' - merakit skrip cerdas & integrasi AI.", type: "success" }
         )
       }
@@ -142,14 +142,14 @@ const Contact = () => {
         newLines.push(
           { text: "Active skill modules:", type: "system" },
           { text: "  - [AI/ML]      Python, PyTorch, LangChain, OpenAI/Gemini SDKs, RAG Systems", type: "green" },
-          { text: "  - [Web Dev]    TypeScript, React, Next.js, TailwindCSS, Node.js", type: "green" },
+          { text: "  - [Web Dev]    TypeScript, React, TailwindCSS", type: "green" },
           { text: "  - [Systems]    Linux Admin, Shell Scripting, Docker, Git CI/CD", type: "green" }
         )
       } else {
         newLines.push(
           { text: "Modul keahlian aktif:", type: "system" },
           { text: "  - [AI/ML]      Python, PyTorch, LangChain, SDK OpenAI/Gemini, Sistem RAG", type: "green" },
-          { text: "  - [Web Dev]    TypeScript, React, Next.js, TailwindCSS, Node.js", type: "green" },
+          { text: "  - [Web Dev]    TypeScript, React, TailwindCSS", type: "green" },
           { text: "  - [Sistem]     Admin Linux, Pembuatan Skrip Shell, Docker, Git CI/CD", type: "green" }
         )
       }
