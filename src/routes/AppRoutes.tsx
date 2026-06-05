@@ -7,6 +7,7 @@ import Assistant from "../pages/Assistant"
 import Contact from "../pages/Contact"
 import PdfAnalysis from "../pages/PdfAnalysis"
 import RemoveBg from "../pages/RemoveBg"
+import ImageToPdf from "../pages/ImageToPdf"
 import MainLayout from "../layouts/MainLayout"
 
 const AppRoutes = () => {
@@ -19,6 +20,7 @@ const AppRoutes = () => {
       <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
       <Route path="/pdf-analysis" element={<MainLayout><PdfAnalysis /></MainLayout>} />
       <Route path="/remove-bg" element={<MainLayout><RemoveBg /></MainLayout>} />
+      <Route path="/image-to-pdf" element={<MainLayout><ImageToPdf /></MainLayout>} />
     </Routes>
   )
 }

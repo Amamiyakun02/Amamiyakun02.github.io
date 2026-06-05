@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ExternalLink, Github, Briefcase, FileText, Bot, ShoppingBag, Image } from "lucide-react"
+import { ExternalLink, Github, Briefcase, FileText, Bot, ShoppingBag, Image, FileImage } from "lucide-react"
 import { useApp } from "../context/AppContext"
 import { useNavigate } from "react-router-dom"
 
@@ -69,6 +69,20 @@ const projectsData: ProjectType[] = [
     githubUrl: "https://github.com/Amamiyakun02/myAgentic-apps",
     liveUrl: "/remove-bg",
     icon: Image,
+    featured: true
+  },
+  {
+    id: 5,
+    title: "Image to PDF Converter",
+    description: {
+      en: "A web utility to compile and convert multiple images into a single high-quality PDF document.",
+      id: "Utilitas web untuk mengumpulkan dan mengonversi beberapa gambar menjadi satu dokumen PDF berkualitas tinggi."
+    },
+    category: "Web",
+    tech: ["React", "TypeScript", "Tailwind CSS", "FastAPI", "PyMuPDF"],
+    githubUrl: "https://github.com/Amamiyakun02/myAgentic-apps",
+    liveUrl: "/image-to-pdf",
+    icon: FileImage,
     featured: true
   }
 ]

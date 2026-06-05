@@ -32,7 +32,7 @@ const MainLayout = ({ children }: Props) => {
   })
   
   const currentPath = location.pathname
-  const menuPath = currentPath === "/pdf-analysis" || currentPath === "/remove-bg" ? "/projects" : currentPath
+  const menuPath = currentPath === "/pdf-analysis" || currentPath === "/remove-bg" || currentPath === "/image-to-pdf" ? "/projects" : currentPath
   const currentIndex = PAGE_FLOW.indexOf(menuPath)
   const isAssistant = currentPath === "/assistant"
 
