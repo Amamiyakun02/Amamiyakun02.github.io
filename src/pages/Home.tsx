@@ -3,7 +3,7 @@ import { Briefcase, Bot, Cpu, Terminal, ArrowRight, Download } from "lucide-reac
 import { useApp } from "../context/AppContext"
 
 const Home = () => {
-  const { t, language, theme } = useApp()
+  const { t, theme } = useApp()
 
   return (
     <div className={`w-full min-h-fit lg:h-full flex flex-col justify-start lg:justify-center items-start p-5 md:p-10 transition-colors ${
@@ -135,11 +135,8 @@ const Home = () => {
 
         {/* CTA 3: Download CV */}
         <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault()
-            alert(language === "en" ? "Downloading CV..." : "Mengunduh berkas CV...")
-          }}
+          href="/profesional-cv.pdf"
+          download="CV_Amamiya.pdf"
           className={`flex items-center gap-1.5 text-xs font-semibold transition ${
             theme === "light" ? "text-slate-500 hover:text-blue-600" : "text-slate-400 hover:text-white"
           }`}

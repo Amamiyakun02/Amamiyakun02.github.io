@@ -71,9 +71,13 @@ export const Other = () => {
               See Project
             </button>
             <span className="w-[2px] h-[40px] bg-gray-300 hidden md:block" />
-            <button className="bg-blue-500 text-white text-sm md:text-lg font-semibold px-6 py-3 rounded-[15px]">
+            <a
+              href="/profesional-cv.pdf"
+              download="CV_Amamiya.pdf"
+              className="bg-blue-500 text-white text-sm md:text-lg font-semibold px-6 py-3 rounded-[15px] inline-flex items-center justify-center"
+            >
               Download CV
-            </button>
+            </a>
           </div>
         </div>
       </div>

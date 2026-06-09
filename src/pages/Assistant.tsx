@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Bot, Send, User, Sparkles, ChevronUp, Trash2, Download } from "lucide-react"
 import { useApp } from "../context/AppContext"
-import avatarRobin from "../assets/images/robin.jpg"
+import avatarNeva from "../assets/images/neva.png"
 
 type Message = {
   id?: string
@@ -175,7 +175,7 @@ const Assistant = () => {
     const saved = localStorage.getItem("assistant_selected_model")
     return (saved === "openai" || saved === "gemini") ? saved : "gemini"
   })
-  
+
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState("")
   const [isTyping, setIsTyping] = useState(false)
@@ -206,7 +206,7 @@ const Assistant = () => {
   // Load saved chat history or initialize welcome message when language or selectedModel changes
   useEffect(() => {
     const saved = localStorage.getItem(`assistant_chat_history_${selectedModel}`)
-    
+
     if (saved) {
       const parsed = JSON.parse(saved) as Message[]
       // If we have history, load it.
@@ -214,9 +214,9 @@ const Assistant = () => {
       if (parsed.length === 1 && parsed[0].sender === "ai") {
         const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.1"
         const welcomeText = language === "en"
-          ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
-          : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
-        
+          ? `Hello! I am Neva, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
+          : `Halo! Saya Neva, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
+
         const newWelcomeMsg: Message = {
           sender: "ai",
           text: welcomeText,
@@ -230,8 +230,8 @@ const Assistant = () => {
     } else {
       const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.1"
       const welcomeText = language === "en"
-        ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
-        : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
+        ? `Hello! I am Neva, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
+        : `Halo! Saya Neva, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
 
       const initialMsg: Message = {
         sender: "ai",
@@ -241,7 +241,7 @@ const Assistant = () => {
       setMessages([initialMsg])
       localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify([initialMsg]))
     }
-    
+
     // Save selected model preference
     localStorage.setItem("assistant_selected_model", selectedModel)
   }, [language, selectedModel])
@@ -250,14 +250,14 @@ const Assistant = () => {
     const confirmMessage = language === "en"
       ? "Are you sure you want to clear the conversation history?"
       : "Apakah Anda yakin ingin menghapus riwayat percakapan?";
-    
+
     if (window.confirm(confirmMessage)) {
       localStorage.removeItem(`assistant_chat_history_${selectedModel}`)
-      
+
       const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.1";
       const welcomeText = language === "en"
-        ? `Hello! I am Robin, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
-        : `Halo! Saya Robin, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`;
+        ? `Hello! I am Neva, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
+        : `Halo! Saya Neva, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`;
 
       const initialMsg: Message = {
         sender: "ai",
@@ -333,7 +333,7 @@ const Assistant = () => {
               // Plain JSON response fallback (e.g. immediate error or JSON payload)
               try {
                 const data = JSON.parse(trimmed)
-                
+
                 if (data.error) {
                   throw new Error(data.error)
                 }
@@ -390,7 +390,7 @@ const Assistant = () => {
                     break
                   }
                   const parsed = JSON.parse(jsonStr)
-                  
+
                   if (parsed.error) {
                     throw new Error(parsed.error)
                   }
@@ -422,7 +422,7 @@ const Assistant = () => {
           const jsonStr = buffer.trim().substring(6).trim()
           if (jsonStr && jsonStr !== "[DONE]") {
             const parsed = JSON.parse(jsonStr)
-            
+
             if (parsed.error) {
               throw new Error(parsed.error)
             }
@@ -456,10 +456,10 @@ const Assistant = () => {
 
     } catch (error) {
       console.error("AI response error:", error)
-      const assistantName = "Robin"
+      const assistantName = "Neva"
       const rawErrorMsg = error instanceof Error ? error.message : String(error)
       const isSystemError = rawErrorMsg.includes("Server communication failed") || rawErrorMsg.includes("Response body is not readable") || rawErrorMsg.includes("failed to fetch")
-      
+
       const errorText = language === "en"
         ? (isSystemError ? `Apologies, I encountered an issue establishing a secure link with ${assistantName}'s server terminal. Please verify your connection or try again.` : `Error: ${rawErrorMsg}`)
         : (isSystemError ? `Mohon maaf, saya mengalami kegagalan transmisi data dengan terminal server ${assistantName}. Silakan periksa koneksi Anda atau coba lagi.` : `Error: ${rawErrorMsg}`)
@@ -513,7 +513,7 @@ const Assistant = () => {
       text: suggestion,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
-    
+
     const updatedMessages = [...messages, userMsg]
     setMessages(updatedMessages)
     localStorage.setItem(`assistant_chat_history_${selectedModel}`, JSON.stringify(updatedMessages))
@@ -599,11 +599,10 @@ const Assistant = () => {
                   href={finalUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 my-1 rounded-xl font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 active:scale-95 cursor-pointer shadow-md decoration-transparent max-w-full break-words whitespace-normal ${
-                    !isUser
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 my-1 rounded-xl font-bold text-xs sm:text-sm tracking-wide transition-all duration-300 active:scale-95 cursor-pointer shadow-md decoration-transparent max-w-full break-words whitespace-normal ${!isUser
                       ? "bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-600 text-white border border-blue-600/15 shadow-blue-500/10"
                       : "bg-white text-blue-600 hover:bg-slate-50 border border-white"
-                  }`}
+                    }`}
                 >
                   <Download className="w-3.5 h-3.5 shrink-0 animate-bounce" style={{ animationDuration: '2s' }} />
                   <span className="break-all sm:break-normal text-left">{linkText}</span>
@@ -616,9 +615,8 @@ const Assistant = () => {
                   href={finalUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`underline font-bold transition-all duration-200 hover:opacity-80 ${
-                    !isUser ? "text-blue-400 hover:text-blue-300" : "text-white hover:text-slate-100"
-                  }`}
+                  className={`underline font-bold transition-all duration-200 hover:opacity-80 ${!isUser ? "text-blue-400 hover:text-blue-300" : "text-white hover:text-slate-100"
+                    }`}
                 >
                   {linkText}
                 </a>
@@ -655,17 +653,15 @@ const Assistant = () => {
         const code = codeLang ? lines.slice(1).join("\n").trim() : part.trim()
 
         return (
-          <div key={index} className={`my-3 rounded-xl overflow-hidden border font-mono shadow-md flex flex-col items-stretch max-w-full select-text transition-colors duration-300 ${
-            theme === "light"
+          <div key={index} className={`my-3 rounded-xl overflow-hidden border font-mono shadow-md flex flex-col items-stretch max-w-full select-text transition-colors duration-300 ${theme === "light"
               ? "bg-[#f6f8fa] border-slate-200 text-slate-800"
               : "bg-[#282a36] border-white/10 text-slate-300"
-          }`}>
+            }`}>
             {/* Header console bar */}
-            <div className={`flex items-center justify-between px-4 py-2 text-[10px] uppercase font-bold tracking-wider select-none flex-shrink-0 border-b transition-colors duration-300 ${
-              theme === "light"
+            <div className={`flex items-center justify-between px-4 py-2 text-[10px] uppercase font-bold tracking-wider select-none flex-shrink-0 border-b transition-colors duration-300 ${theme === "light"
                 ? "bg-slate-100 border-slate-200 text-slate-500"
                 : "bg-slate-900/60 border-white/[0.04] text-slate-400"
-            }`}>
+              }`}>
               <span className={theme === "light" ? "text-blue-600 font-bold" : "text-cyan-400"}>{codeLang || "code"}</span>
               <button
                 type="button"
@@ -674,19 +670,17 @@ const Assistant = () => {
                   navigator.clipboard.writeText(code)
                   alert(language === "id" ? "Kode berhasil disalin!" : "Code copied to clipboard!")
                 }}
-                className={`px-2.5 py-1 rounded border text-[9px] font-bold uppercase tracking-wider transition duration-150 active:scale-95 cursor-pointer ${
-                  theme === "light"
+                className={`px-2.5 py-1 rounded border text-[9px] font-bold uppercase tracking-wider transition duration-150 active:scale-95 cursor-pointer ${theme === "light"
                     ? "bg-slate-200/80 hover:bg-slate-300/80 text-slate-600 border-slate-300/50 hover:text-slate-950"
                     : "bg-slate-800/80 hover:bg-slate-700/80 text-slate-400 hover:text-white border-white/5"
-                }`}
+                  }`}
               >
                 Copy
               </button>
             </div>
             {/* Syntax-highlight styled container */}
-            <pre className={`p-4 text-xs overflow-x-auto scrollbar-thin leading-relaxed ${
-              theme === "light" ? "text-slate-800" : "text-slate-300"
-            }`}>
+            <pre className={`p-4 text-xs overflow-x-auto scrollbar-thin leading-relaxed ${theme === "light" ? "text-slate-800" : "text-slate-300"
+              }`}>
               <code dangerouslySetInnerHTML={{ __html: highlightCode(code, codeLang, theme !== "light") }} />
             </pre>
           </div>
@@ -702,19 +696,16 @@ const Assistant = () => {
   }
 
   return (
-    <div className={`w-full flex-1 min-h-0 min-w-0 flex flex-col justify-between items-stretch p-3 pb-28 pt-2 lg:p-6 lg:pb-6 ${
-      theme === "light" ? "text-slate-800" : "text-slate-100"
-    }`}>
-      {/* Sleek Compact Header */}
-      <div className={`animate-fade-in flex-shrink-0 flex items-center justify-between border-b pb-3 mb-2 transition-colors duration-300 ${
-        theme === "light" ? "border-slate-200" : "border-white/[0.04]"
+    <div className={`w-full flex-1 min-h-0 min-w-0 flex flex-col justify-between items-stretch p-3 pb-28 pt-2 lg:p-6 lg:pb-6 ${theme === "light" ? "text-slate-800" : "text-slate-100"
       }`}>
+      {/* Sleek Compact Header */}
+      <div className={`animate-fade-in flex-shrink-0 flex items-center justify-between border-b pb-3 mb-2 transition-colors duration-300 ${theme === "light" ? "border-slate-200" : "border-white/[0.04]"
+        }`}>
         <div className="flex items-center gap-2 sm:gap-2.5">
-          <div className={`p-1.5 sm:p-2 rounded-xl border transition-colors duration-300 ${
-            theme === "light"
+          <div className={`p-1.5 sm:p-2 rounded-xl border transition-colors duration-300 ${theme === "light"
               ? "bg-blue-50 text-blue-600 border-blue-200"
               : "bg-blue-500/10 text-blue-400 border-blue-500/20"
-          }`}>
+            }`}>
             <Bot size={18} className="sm:w-5 sm:h-5" />
           </div>
           <div>
@@ -723,7 +714,7 @@ const Assistant = () => {
             </h1>
             <p className="text-[10px] text-slate-400 mt-0.5 select-none line-clamp-1 sm:line-clamp-none">
               <span className="inline sm:hidden">
-                {selectedModel === "openai" ? "Robin (OpenAI)" : "Robin (Gemini)"}
+                {selectedModel === "openai" ? "Neva (OpenAI)" : "Neva (Gemini)"}
               </span>
               <span className="hidden sm:inline">
                 {selectedModel === "openai" ? "Amamiya's Personal AI Assistant (OpenAI Edition)" : "Amamiya's Personal AI Assistant (Gemini Edition)"}
@@ -731,16 +722,15 @@ const Assistant = () => {
             </p>
           </div>
         </div>
-        
+
         {/* Clear Chat Button */}
         <button
           type="button"
           onClick={handleClearChat}
-          className={`px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 active:scale-95 cursor-pointer ${
-            theme === "light"
+          className={`px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 active:scale-95 cursor-pointer ${theme === "light"
               ? "bg-slate-100 hover:bg-rose-50 border border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-200"
               : "bg-slate-900/40 hover:bg-rose-500/5 border border-white/[0.04] text-slate-400 hover:text-rose-400 hover:border-rose-500/25"
-          }`}
+            }`}
           title={language === "en" ? "Clear conversation history" : "Hapus riwayat percakapan"}
         >
           <Trash2 size={12} />
@@ -767,8 +757,8 @@ const Assistant = () => {
                 : "border-purple-500/30 bg-slate-950 shadow-[0_0_10px_rgba(168,85,247,0.25)]"
                 }`}>
                 <img
-                  src={avatarRobin}
-                  alt="Robin"
+                  src={avatarNeva}
+                  alt="Neva"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -798,8 +788,8 @@ const Assistant = () => {
               : "border-purple-500/30 bg-slate-950 shadow-[0_0_10px_rgba(168,85,247,0.25)]"
               }`}>
               <img
-                src={avatarRobin}
-                alt="Robin"
+                src={avatarNeva}
+                alt="Neva"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -822,11 +812,10 @@ const Assistant = () => {
               <button
                 key={idx}
                 onClick={() => handleSuggestionClick(sug)}
-                className={`text-[10px] sm:text-[11px] md:text-xs font-semibold px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 flex-shrink-0 border cursor-pointer ${
-                  theme === "light"
+                className={`text-[10px] sm:text-[11px] md:text-xs font-semibold px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 flex-shrink-0 border cursor-pointer ${theme === "light"
                     ? "bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200 hover:border-blue-500/45 hover:text-blue-600"
                     : "bg-slate-900/40 hover:bg-slate-900/60 text-slate-400 hover:text-white border-white/[0.04] hover:border-blue-500/35"
-                }`}
+                  }`}
               >
                 <Sparkles size={11} className="text-blue-500" />
                 <span>{sug}</span>
@@ -842,15 +831,14 @@ const Assistant = () => {
             <button
               type="button"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className={`h-11 px-2.5 sm:px-3.5 rounded-xl text-[10px] md:text-xs font-bold uppercase flex items-center gap-1.5 sm:gap-2 border transition-all duration-200 active:scale-95 cursor-pointer ${
-                selectedModel === "openai"
+              className={`h-11 px-2.5 sm:px-3.5 rounded-xl text-[10px] md:text-xs font-bold uppercase flex items-center gap-1.5 sm:gap-2 border transition-all duration-200 active:scale-95 cursor-pointer ${selectedModel === "openai"
                   ? theme === "light"
                     ? "bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100"
                     : "bg-blue-600/10 border-blue-500/30 text-blue-400 shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:bg-blue-600/20"
                   : theme === "light"
                     ? "bg-purple-50 border-purple-200 text-purple-600 hover:bg-purple-100"
                     : "bg-purple-600/10 border-purple-500/30 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.15)] hover:bg-purple-600/20"
-              }`}
+                }`}
               title="Select AI Model Engine"
             >
               {selectedModel === "openai" ? (
@@ -864,24 +852,22 @@ const Assistant = () => {
 
             {/* Dropdown Menu - Floats upward cleanly above the input bar */}
             {isDropdownOpen && (
-              <div className={`absolute bottom-full mb-2 left-0 w-44 backdrop-blur-xl border rounded-xl p-1 shadow-2xl z-50 animate-fade-in flex flex-col gap-0.5 ${
-                theme === "light"
+              <div className={`absolute bottom-full mb-2 left-0 w-44 backdrop-blur-xl border rounded-xl p-1 shadow-2xl z-50 animate-fade-in flex flex-col gap-0.5 ${theme === "light"
                   ? "bg-white/95 border-slate-200 shadow-slate-200/50"
                   : "bg-slate-950/95 border-white/[0.08] shadow-blue-500/5"
-              }`}>
+                }`}>
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedModel("openai")
                     setIsDropdownOpen(false)
                   }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition duration-150 flex items-center gap-2 cursor-pointer ${
-                    selectedModel === "openai"
+                  className={`w-full text-left px-3 py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition duration-150 flex items-center gap-2 cursor-pointer ${selectedModel === "openai"
                       ? "bg-blue-600 text-white shadow-md glow-blue"
                       : theme === "light"
                         ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                         : "text-slate-400 hover:text-white hover:bg-white/5"
-                  }`}
+                    }`}
                 >
                   <OpenAILogo className="w-3.5 h-3.5" isActive={selectedModel === "openai"} theme={theme} />
                   <span>OpenAI</span>
@@ -892,13 +878,12 @@ const Assistant = () => {
                     setSelectedModel("gemini")
                     setIsDropdownOpen(false)
                   }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition duration-150 flex items-center gap-2 cursor-pointer ${
-                    selectedModel === "gemini"
+                  className={`w-full text-left px-3 py-2 rounded-lg text-[10px] md:text-xs font-bold uppercase transition duration-150 flex items-center gap-2 cursor-pointer ${selectedModel === "gemini"
                       ? "bg-purple-600 text-white shadow-md glow-purple"
                       : theme === "light"
                         ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                         : "text-slate-400 hover:text-white hover:bg-white/5"
-                  }`}
+                    }`}
                 >
                   <GeminiLogo className="w-3.5 h-3.5" isActive={selectedModel === "gemini"} />
                   <span>Gemini-3.1</span>

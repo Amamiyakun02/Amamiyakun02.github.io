@@ -1,4 +1,4 @@
-import assistantIcon from "../assets/images/profile.jpg"
+import assistantIcon from "../assets/images/neva.png"
 
 const AssistantButton = () => {
   const handleClick = () => {

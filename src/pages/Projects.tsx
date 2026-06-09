@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { ExternalLink, Github, Briefcase, FileText, Bot, ShoppingBag, Image, FileImage } from "lucide-react"
+import { ExternalLink, Github, Briefcase, FileText, Bot, ShoppingBag, Image, FileImage, LayoutDashboard } from "lucide-react"
 import { useApp } from "../context/AppContext"
 import { useNavigate } from "react-router-dom"
 
@@ -20,8 +20,8 @@ const projectsData: ProjectType[] = [
     id: 1,
     title: "PDF Analysis Tool",
     description: {
-      en: "An AI-powered document analysis tool. Upload PDF files to extract structural metadata, summarize details, and analyze color distribution per page.",
-      id: "Alat analisis dokumen berbasis AI. Unggah file PDF untuk mengekstrak metadata struktural, merangkum detail, dan menganalisis sebaran warna per halaman."
+      en: "A full-stack AI document analysis platform built with React and FastAPI. Upload any PDF to extract page count, file size, font families, and embedded image metadata. Powered by PyMuPDF for deep structural parsing, with per-page color distribution heatmaps and an AI-generated document summary via integrated LLM.",
+      id: "Platform analisis dokumen AI full-stack yang dibangun dengan React dan FastAPI. Unggah PDF apa pun untuk mengekstrak jumlah halaman, ukuran file, jenis font, dan metadata gambar tertanam. Didukung PyMuPDF untuk parsing struktural mendalam, dengan heatmap distribusi warna per halaman dan ringkasan dokumen yang dibuat oleh LLM terintegrasi."
     },
     category: "AI/ML",
     tech: ["React", "TypeScript", "Tailwind CSS", "FastAPI", "PyMuPDF"],
@@ -34,11 +34,11 @@ const projectsData: ProjectType[] = [
     id: 2,
     title: "Agent MCP",
     description: {
-      en: "A Model Context Protocol (MCP) server integration for AI agents, allowing LLMs to securely query databases, access file systems, and execute system commands.",
-      id: "Integrasi server Model Context Protocol (MCP) untuk agen AI, memungkinkan LLM untuk menanyakan basis data, mengakses sistem berkas, dan mengeksekusi perintah sistem secara aman."
+      en: "A production-ready Model Context Protocol (MCP) server built with Python and the MCP SDK. Exposes 10 callable tools to AI agents — including math operations, system info, text manipulation, and real-time clock — plus resources and prompt templates. Designed to integrate seamlessly with Claude Desktop and other MCP-compatible LLM clients via stdio.",
+      id: "Server Model Context Protocol (MCP) siap produksi yang dibangun dengan Python dan MCP SDK. Mengekspos 10 tool yang dapat dipanggil oleh agen AI — termasuk operasi matematika, info sistem, manipulasi teks, dan jam real-time — serta resources dan template prompt. Dirancang untuk terintegrasi mulus dengan Claude Desktop dan klien LLM kompatibel MCP lainnya via stdio."
     },
     category: "AI/ML",
-    tech: ["Python", "NodeJS", "MCP SDK", "AI Integration", "CLI Tools"],
+    tech: ["Python", "MCP SDK", "uv", "AI Integration", "Claude Desktop"],
     githubUrl: "https://github.com/Amamiyakun02/AgentMCP",
     icon: Bot,
     featured: true
@@ -47,11 +47,11 @@ const projectsData: ProjectType[] = [
     id: 3,
     title: "Lina Deals",
     description: {
-      en: "A deals aggregator and discount finder platform. Users can browse, filter, and track discount offers across e-commerce channels in real-time.",
-      id: "Platform agregator penawaran dan pencari diskon. Pengguna dapat meramban, memfilter, dan melacak penawaran diskon di berbagai saluran e-commerce secara real-time."
+      en: "A modern e-commerce deals aggregator and AI shopping assistant platform built with Next.js and React 19. Browse and filter curated discount offers across multiple channels, powered by a conversational AI chatbot backed by a vector database (Qdrant) and a scraping pipeline. Deployed on Vercel with a custom MCP server for live product search.",
+      id: "Platform agregator penawaran e-commerce modern dan asisten belanja AI yang dibangun dengan Next.js dan React 19. Temukan dan filter penawaran diskon pilihan dari berbagai saluran, didukung chatbot AI percakapan dengan vector database (Qdrant) dan pipeline scraping. Di-deploy di Vercel dengan MCP server khusus untuk pencarian produk langsung."
     },
     category: "Web",
-    tech: ["Next.js", "React 19", "Tailwind CSS", "Vercel", "API Integration"],
+    tech: ["Next.js", "React 19", "Tailwind CSS", "Qdrant", "Vercel"],
     githubUrl: "https://github.com/Amamiyakun02/lina-deals",
     liveUrl: "https://lina-deals.vercel.app",
     icon: ShoppingBag,
@@ -61,8 +61,8 @@ const projectsData: ProjectType[] = [
     id: 4,
     title: "AI Background Remover",
     description: {
-      en: "An AI-powered image background removal tool. Upload images (PNG/JPG) to automatically detect and erase backgrounds in real-time.",
-      id: "Alat penghapus background gambar berbasis AI. Unggah gambar (PNG/JPG) untuk secara otomatis mendeteksi dan menghapus background secara real-time."
+      en: "An in-browser AI background removal tool powered by Hugging Face's Bi-RefNet model — a state-of-the-art bilateral reference network for high-precision subject segmentation. Supports PNG and JPG uploads with real-time processing, before/after preview, and one-click download of the transparent output, all without sending data to a custom backend.",
+      id: "Alat penghapus background AI berbasis browser yang didukung model Bi-RefNet dari Hugging Face — jaringan referensi bilateral mutakhir untuk segmentasi subjek presisi tinggi. Mendukung unggahan PNG dan JPG dengan pemrosesan real-time, pratinjau sebelum/sesudah, dan unduhan satu klik hasil transparan, semua tanpa mengirim data ke backend khusus."
     },
     category: "AI/ML",
     tech: ["React", "TypeScript", "Tailwind CSS", "Hugging Face Spaces", "Bi-RefNet"],
@@ -75,14 +75,27 @@ const projectsData: ProjectType[] = [
     id: 5,
     title: "Image to PDF Converter",
     description: {
-      en: "A web utility to compile and convert multiple images into a single high-quality PDF document.",
-      id: "Utilitas web untuk mengumpulkan dan mengonversi beberapa gambar menjadi satu dokumen PDF berkualitas tinggi."
+      en: "A drag-and-drop web utility for compiling multiple images into a single, print-ready PDF document. Supports PNG and JPG files with reorderable previews before conversion. The FastAPI backend uses PyMuPDF to produce high-fidelity PDFs, preserving original image dimensions and quality — ideal for scanning, archiving, and document workflows.",
+      id: "Utilitas web drag-and-drop untuk menyatukan beberapa gambar menjadi satu dokumen PDF siap cetak. Mendukung file PNG dan JPG dengan pratinjau yang dapat diurutkan ulang sebelum konversi. Backend FastAPI menggunakan PyMuPDF untuk menghasilkan PDF berkualitas tinggi, mempertahankan dimensi dan kualitas gambar asli — ideal untuk scanning, pengarsipan, dan alur kerja dokumen."
     },
     category: "Web",
     tech: ["React", "TypeScript", "Tailwind CSS", "FastAPI", "PyMuPDF"],
     githubUrl: "https://github.com/Amamiyakun02/myAgentic-apps",
     liveUrl: "/image-to-pdf",
     icon: FileImage,
+    featured: true
+  },
+  {
+    id: 6,
+    title: "Agent Dashboard",
+    description: {
+      en: "A full-featured internal admin dashboard for managing AI agent data and knowledge bases. Features role-based access control (Superadmin & Sales), full CRUD operations for products, brands, categories, users, bookings, and chat sessions. Includes a Knowledge Management module for uploading and indexing documents into a vector store, powering a retrieval-augmented AI assistant.",
+      id: "Dashboard admin internal berfitur lengkap untuk mengelola data agen AI dan knowledge base. Dilengkapi kontrol akses berbasis peran (Superadmin & Sales), operasi CRUD lengkap untuk produk, merek, kategori, pengguna, pemesanan, dan sesi chat. Termasuk modul Knowledge Management untuk mengunggah dan mengindeks dokumen ke vector store, yang mendukung asisten AI berbasis retrieval."
+    },
+    category: "Web",
+    tech: ["React", "TypeScript", "Vite", "ShadCN UI", "FastAPI", "Qdrant"],
+    githubUrl: "https://github.com/Amamiyakun02/AgentDashboard",
+    icon: LayoutDashboard,
     featured: true
   }
 ]
