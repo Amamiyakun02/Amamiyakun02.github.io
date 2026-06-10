@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react"
-import { Bot, Send, User, Sparkles, ChevronUp, Trash2, Download } from "lucide-react"
+import { Send, User, Sparkles, ChevronUp, Trash2, Download } from "lucide-react"
 import { useApp } from "../context/AppContext"
-import avatarNeva from "../assets/images/neva.png"
+import avatarVienna from "../assets/images/vienna.png"
 
 type Message = {
   id?: string
@@ -214,8 +214,8 @@ const Assistant = () => {
       if (parsed.length === 1 && parsed[0].sender === "ai") {
         const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.1"
         const welcomeText = language === "en"
-          ? `Hello! I am Neva, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
-          : `Halo! Saya Neva, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
+          ? `Hello! I am Vienna, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
+          : `Halo! Saya Vienna, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
 
         const newWelcomeMsg: Message = {
           sender: "ai",
@@ -230,8 +230,8 @@ const Assistant = () => {
     } else {
       const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.1"
       const welcomeText = language === "en"
-        ? `Hello! I am Neva, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
-        : `Halo! Saya Neva, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
+        ? `Hello! I am Vienna, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
+        : `Halo! Saya Vienna, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`
 
       const initialMsg: Message = {
         sender: "ai",
@@ -256,8 +256,8 @@ const Assistant = () => {
 
       const modelLabel = selectedModel === "openai" ? "OpenAI GPT-5.4" : "Google Gemini-3.1";
       const welcomeText = language === "en"
-        ? `Hello! I am Neva, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
-        : `Halo! Saya Neva, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`;
+        ? `Hello! I am Vienna, Amamiya's dynamic AI Assistant (powered by ${modelLabel}). Ask me anything about Amamiya's engineering skills, Linux scripting experience, projects, or how to hire him!`
+        : `Halo! Saya Vienna, Asisten AI Amamiya yang dinamis (ditenagai oleh ${modelLabel}). Tanyakan apa saja kepada saya tentang keahlian rekayasa Amamiya, pengalaman penulisan skrip Linux, proyek-proyeknya, atau cara merekrutnya!`;
 
       const initialMsg: Message = {
         sender: "ai",
@@ -300,7 +300,8 @@ const Assistant = () => {
         },
         body: JSON.stringify({
           user_id: userId,
-          messages: apiMessages
+          messages: apiMessages,
+          lang: language
         })
       })
 
@@ -456,7 +457,7 @@ const Assistant = () => {
 
     } catch (error) {
       console.error("AI response error:", error)
-      const assistantName = "Neva"
+      const assistantName = "Vienna"
       const rawErrorMsg = error instanceof Error ? error.message : String(error)
       const isSystemError = rawErrorMsg.includes("Server communication failed") || rawErrorMsg.includes("Response body is not readable") || rawErrorMsg.includes("failed to fetch")
 
@@ -702,11 +703,11 @@ const Assistant = () => {
       <div className={`animate-fade-in flex-shrink-0 flex items-center justify-between border-b pb-3 mb-2 transition-colors duration-300 ${theme === "light" ? "border-slate-200" : "border-white/[0.04]"
         }`}>
         <div className="flex items-center gap-2 sm:gap-2.5">
-          <div className={`p-1.5 sm:p-2 rounded-xl border transition-colors duration-300 ${theme === "light"
-              ? "bg-blue-50 text-blue-600 border-blue-200"
-              : "bg-blue-500/10 text-blue-400 border-blue-500/20"
+          <div className={`p-1 sm:p-1.5 rounded-xl border overflow-hidden transition-colors duration-300 ${theme === "light"
+              ? "bg-blue-50 border-blue-200"
+              : "bg-blue-500/10 border-blue-500/20"
             }`}>
-            <Bot size={18} className="sm:w-5 sm:h-5" />
+            <img src={avatarVienna} alt="Vienna" className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] rounded-md object-cover" />
           </div>
           <div>
             <h1 className="text-lg sm:text-xl md:text-2xl font-black text-white leading-none">
@@ -714,7 +715,7 @@ const Assistant = () => {
             </h1>
             <p className="text-[10px] text-slate-400 mt-0.5 select-none line-clamp-1 sm:line-clamp-none">
               <span className="inline sm:hidden">
-                {selectedModel === "openai" ? "Neva (OpenAI)" : "Neva (Gemini)"}
+                {selectedModel === "openai" ? "Vienna (OpenAI)" : "Vienna (Gemini)"}
               </span>
               <span className="hidden sm:inline">
                 {selectedModel === "openai" ? "Amamiya's Personal AI Assistant (OpenAI Edition)" : "Amamiya's Personal AI Assistant (Gemini Edition)"}
@@ -757,8 +758,8 @@ const Assistant = () => {
                 : "border-purple-500/30 bg-slate-950 shadow-[0_0_10px_rgba(168,85,247,0.25)]"
                 }`}>
                 <img
-                  src={avatarNeva}
-                  alt="Neva"
+                  src={avatarVienna}
+                  alt="Vienna"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -788,8 +789,8 @@ const Assistant = () => {
               : "border-purple-500/30 bg-slate-950 shadow-[0_0_10px_rgba(168,85,247,0.25)]"
               }`}>
               <img
-                src={avatarNeva}
-                alt="Neva"
+                src={avatarVienna}
+                alt="Vienna"
                 className="w-full h-full object-cover"
               />
             </div>

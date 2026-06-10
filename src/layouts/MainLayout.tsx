@@ -35,6 +35,8 @@ const MainLayout = ({ children }: Props) => {
   const menuPath = currentPath === "/pdf-analysis" || currentPath === "/remove-bg" || currentPath === "/image-to-pdf" ? "/projects" : currentPath
   const currentIndex = PAGE_FLOW.indexOf(menuPath)
   const isAssistant = currentPath === "/assistant"
+  const isProjects = currentPath === "/projects"
+  const isNoScrollPage = isAssistant || isProjects
 
   const [prevIndex, setPrevIndex] = useState(currentIndex)
   const [direction, setDirection] = useState<"forward" | "backward">("forward")
@@ -286,7 +288,7 @@ const MainLayout = ({ children }: Props) => {
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className={`flex-1 min-h-0 w-full ${isAssistant ? "overflow-hidden pb-4 lg:pb-8" : "overflow-y-auto pb-36 lg:pb-8"} overflow-x-hidden relative flex flex-col justify-start items-stretch pt-14 lg:pt-0`}
+              className={`flex-1 min-h-0 w-full ${isNoScrollPage ? "overflow-hidden pb-4 lg:pb-8" : "overflow-y-auto pb-36 lg:pb-8"} overflow-x-hidden relative flex flex-col justify-start items-stretch pt-14 lg:pt-0`}
             >
               <div
                 key={currentPath}

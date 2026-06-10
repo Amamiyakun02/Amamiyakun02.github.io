@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { ExternalLink, Github, Briefcase, FileText, Bot, ShoppingBag, Image, FileImage, LayoutDashboard } from "lucide-react"
 import { useApp } from "../context/AppContext"
 import { useNavigate } from "react-router-dom"
@@ -47,11 +47,11 @@ const projectsData: ProjectType[] = [
     id: 3,
     title: "Lina Deals",
     description: {
-      en: "A modern e-commerce deals aggregator and AI shopping assistant platform built with Next.js and React 19. Browse and filter curated discount offers across multiple channels, powered by a conversational AI chatbot backed by a vector database (Qdrant) and a scraping pipeline. Deployed on Vercel with a custom MCP server for live product search.",
-      id: "Platform agregator penawaran e-commerce modern dan asisten belanja AI yang dibangun dengan Next.js dan React 19. Temukan dan filter penawaran diskon pilihan dari berbagai saluran, didukung chatbot AI percakapan dengan vector database (Qdrant) dan pipeline scraping. Di-deploy di Vercel dengan MCP server khusus untuk pencarian produk langsung."
+      en: "A modern e-commerce deals aggregator and AI shopping assistant platform built with React 19 and FastAPI. Browse and filter curated discount offers across multiple channels, powered by a conversational AI chatbot backed by a vector database (Qdrant) and a scraping pipeline. Deployed on Vercel with a custom MCP server for live product search.",
+      id: "Platform agregator penawaran e-commerce modern dan asisten belanja AI yang dibangun dengan React 19 dan FastAPI. Temukan dan filter penawaran diskon pilihan dari berbagai saluran, didukung chatbot AI percakapan dengan vector database (Qdrant) dan pipeline scraping. Di-deploy di Vercel dengan MCP server khusus untuk pencarian produk langsung."
     },
     category: "Web",
-    tech: ["Next.js", "React 19", "Tailwind CSS", "Qdrant", "Vercel"],
+    tech: ["React 19", "Tailwind CSS", "FastAPI", "Qdrant", "Vercel"],
     githubUrl: "https://github.com/Amamiyakun02/lina-deals",
     liveUrl: "https://lina-deals.vercel.app",
     icon: ShoppingBag,
@@ -104,6 +104,13 @@ const Projects = () => {
   const { t, language } = useApp()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<"All" | "AI/ML" | "Web" | "Mobile" | "CLI">("All")
+  const gridRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (gridRef.current) {
+      gridRef.current.scrollTop = 0
+    }
+  }, [activeTab])
 
   const filteredProjects = activeTab === "All"
     ? projectsData
@@ -117,10 +124,10 @@ const Projects = () => {
   }
 
   return (
-    <div className="w-full min-h-fit lg:h-full flex flex-col justify-start items-start p-5 md:p-10 text-slate-100">
+    <div className="w-full flex-1 min-h-0 flex flex-col justify-start items-stretch p-5 md:p-10 text-slate-100 overflow-hidden">
       
       {/* Header */}
-      <div className="mb-8 animate-fade-in">
+      <div className="mb-6 animate-fade-in flex-shrink-0">
         <div className="flex items-center gap-3 text-blue-400 font-semibold uppercase tracking-wider text-xs md:text-sm">
           <Briefcase size={16} />
           <span>{t("projectsBanner")}</span>
@@ -134,7 +141,7 @@ const Projects = () => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-2 mb-8 bg-slate-950/40 p-1.5 rounded-xl border border-white/[0.05] w-full max-w-lg">
+      <div className="flex flex-wrap gap-2 mb-6 bg-slate-950/40 p-1.5 rounded-xl border border-white/[0.05] w-full max-w-lg flex-shrink-0">
         {(["All", "AI/ML", "Web", "Mobile", "CLI"] as const).map(tab => (
           <button
             key={tab}
@@ -151,29 +158,32 @@ const Projects = () => {
       </div>
 
       {/* Projects Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full lg:overflow-y-auto lg:max-h-[480px] pr-2">
+      <div 
+        ref={gridRef}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full flex-1 overflow-y-auto pr-2 min-h-0 pb-24 lg:pb-8 scrollbar-thin content-start"
+      >
         {filteredProjects.length > 0 ? (
           filteredProjects.map((project, idx) => {
             const IconComp = project.icon
             return (
               <div
                 key={project.id}
-                style={{ animationDelay: `${idx * 0.1}s` }}
+                style={{ animationDelay: `${idx * 0.08}s` }}
                 onClick={() => {
                   if (project.liveUrl && project.liveUrl.startsWith("/")) {
                     navigate(project.liveUrl)
                   }
                 }}
-                className={`group relative flex flex-col bg-slate-900/30 border border-white/[0.04] rounded-2xl p-5 md:p-6 hover:border-blue-500/30 hover:bg-slate-900/50 hover:shadow-[0_8px_30px_rgba(59,130,246,0.08)] transition-all duration-300 transform hover:-translate-y-1 overflow-hidden ${
+                className={`group relative flex flex-col bg-gradient-to-br from-slate-900/60 to-slate-950/45 border border-white/[0.05] rounded-[24px] p-5 md:p-6 hover:border-blue-500/30 hover:bg-slate-900/50 hover:shadow-[0_12px_40px_rgba(59,130,246,0.12)] transition-all duration-300 transform hover:-translate-y-1 ${
                   project.liveUrl && project.liveUrl.startsWith("/") ? "cursor-pointer" : ""
                 }`}
               >
                 {/* Accent glow on top left */}
-                <div className="absolute -top-10 -left-10 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all duration-300" />
+                <div className="absolute -top-10 -left-10 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all duration-500 pointer-events-none" />
                 
                 {/* Project Header */}
                 <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400 border border-blue-500/20 group-hover:scale-110 transition-transform duration-300">
+                  <div className="p-3 bg-blue-600/10 rounded-2xl text-blue-400 border border-blue-500/15 group-hover:scale-110 group-hover:bg-blue-600/15 transition-all duration-300">
                     <IconComp size={22} />
                   </div>
                   
@@ -184,7 +194,7 @@ const Projects = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="p-2 bg-slate-950/60 rounded-full text-slate-400 hover:text-white hover:bg-slate-950 border border-white/[0.05] transition-all"
+                      className="p-2.5 bg-slate-950/40 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/80 border border-white/[0.04] hover:border-blue-500/30 transition-all duration-300"
                       title={language === "en" ? "View GitHub Repository" : "Lihat Repositori GitHub"}
                     >
                       <Github size={16} />
@@ -196,7 +206,7 @@ const Projects = () => {
                             e.stopPropagation()
                             navigate(project.liveUrl!)
                           }}
-                          className="p-2 bg-slate-950/60 rounded-full text-slate-400 hover:text-white hover:bg-slate-950 border border-white/[0.05] transition-all cursor-pointer"
+                          className="p-2.5 bg-slate-950/40 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/80 border border-white/[0.04] hover:border-blue-500/30 transition-all duration-300 cursor-pointer"
                           title={language === "en" ? "View Live Demo" : "Lihat Demo Langsung"}
                         >
                           <ExternalLink size={16} />
@@ -207,7 +217,7 @@ const Projects = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="p-2 bg-slate-950/60 rounded-full text-slate-400 hover:text-white hover:bg-slate-950 border border-white/[0.05] transition-all"
+                          className="p-2.5 bg-slate-950/40 rounded-xl text-slate-400 hover:text-white hover:bg-slate-900/80 border border-white/[0.04] hover:border-blue-500/30 transition-all duration-300"
                           title={language === "en" ? "View Live Demo" : "Lihat Demo Langsung"}
                         >
                           <ExternalLink size={16} />
@@ -218,23 +228,23 @@ const Projects = () => {
                 </div>
 
                 {/* Project Info */}
-                <h3 className="text-lg md:text-xl font-bold text-white group-hover:text-blue-400 transition-colors duration-200">
+                <h3 className="text-lg md:text-xl font-black text-white group-hover:text-blue-400 transition-colors duration-300">
                   {project.title}
                 </h3>
-                <span className="inline-block self-start text-[10px] uppercase font-bold text-blue-400 px-2 py-0.5 mt-1 bg-blue-500/10 rounded-md border border-blue-500/10">
+                <span className="inline-block self-start text-[9px] tracking-wider uppercase font-bold text-blue-400 px-2.5 py-0.5 mt-2 bg-blue-500/10 rounded-full border border-blue-500/15">
                   {project.category}
                 </span>
 
-                <p className="text-xs md:text-sm text-slate-400 mt-3 leading-relaxed flex-1">
+                <p className="text-xs md:text-sm text-slate-300/90 mt-4 leading-relaxed flex-grow">
                   {project.description[language]}
                 </p>
 
                 {/* Tech Badges */}
-                <div className="mt-5 flex flex-wrap gap-1.5 pt-3 border-t border-white/[0.04]">
+                <div className="mt-6 flex flex-wrap gap-1.5 pt-4 border-t border-white/[0.05]">
                   {project.tech.map((t, i) => (
                     <span
                       key={i}
-                      className="text-[10px] font-semibold bg-slate-950/40 text-slate-400 px-2 py-1 rounded-md border border-white/[0.04]"
+                      className="text-[10px] font-bold bg-white/[0.02] text-slate-300 px-2.5 py-1 rounded-lg border border-white/[0.04] transition-all hover:bg-white/[0.05] hover:text-white"
                     >
                       {t}
                     </span>

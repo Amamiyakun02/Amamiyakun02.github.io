@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import { Briefcase, Bot, Cpu, Terminal, ArrowRight, Download } from "lucide-react"
 import { useApp } from "../context/AppContext"
+import avatarVienna from "../assets/images/vienna.png"
 
 const Home = () => {
   const { t, theme } = useApp()
@@ -124,7 +125,7 @@ const Home = () => {
               : "bg-slate-900/80 hover:bg-slate-800 text-slate-200 border-white/[0.08] hover:border-blue-500/35"
           }`}
         >
-          <Bot size={14} className="text-blue-400" />
+          <img src={avatarVienna} alt="Vienna" className="w-3.5 h-3.5 rounded-full object-cover" />
           <span>{t("homeCtaTwin")}</span>
         </Link>
 

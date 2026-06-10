@@ -178,12 +178,12 @@ export const translations = {
     id: "Ruang AI Interaktif"
   },
   assistantTitle: {
-    en: "Chat with Neva",
-    id: "Obrol dengan Neva"
+    en: "Chat with Vienna",
+    id: "Obrol dengan Vienna"
   },
   assistantDesc: {
-    en: "An interactive conversational clone powered by structural portfolio embeddings.",
-    id: "Klon percakapan interaktif yang ditenagai oleh sematan portofolio terstruktur."
+    en: "An interactive AI Assistant powered by structural portfolio embeddings.",
+    id: "Asisten AI interaktif yang ditenagai oleh sematan portofolio terstruktur."
   },
   assistantAlert: {
     en: "Simulated assistant. Powered by structural portfolio contexts.",
