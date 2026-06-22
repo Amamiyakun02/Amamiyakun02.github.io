@@ -24,7 +24,8 @@ const Feedback = () => {
     setError("")
     
     try {
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
+      const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      const API_URL = import.meta.env.VITE_API_URL || (isLocalhost ? "http://127.0.0.1:8000" : "https://myagentic-apps.fastapicloud.dev")
       const res = await fetch(`${API_URL}/v1/admin/feedbacks`, {
         method: "POST",
         headers: {
