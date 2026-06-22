@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useState } from "react"
 import { useLocation, useNavigate, Link } from "react-router-dom"
-import { Home, User, Briefcase, Bot, Mail, ChevronLeft, ChevronRight, Sun, Moon } from "lucide-react"
+import { Home, User, Briefcase, Bot, Mail, ChevronLeft, ChevronRight, Sun, Moon, MessageSquare } from "lucide-react"
 import Sidebar from "../components/Sidebar"
 import avatar from "../assets/images/profile.jpeg"
 import { useApp } from "../context/AppContext"
@@ -9,7 +9,7 @@ type Props = {
   children: ReactNode
 }
 
-const PAGE_FLOW = ["/", "/about", "/projects", "/assistant", "/contact"]
+const PAGE_FLOW = ["/", "/about", "/projects", "/assistant", "/contact", "/feedback"]
 
 // Config for each page: icon factory + label
 const PAGE_CONFIG: Record<string, {
@@ -21,6 +21,7 @@ const PAGE_CONFIG: Record<string, {
   '/projects':  { icon: (s) => <Briefcase size={s} />, label: { en: 'Work',    id: 'Proyek'  } },
   '/assistant': { icon: (s) => <Bot size={s} />,       label: { en: 'AI',      id: 'AI'      } },
   '/contact':   { icon: (s) => <Mail size={s} />,      label: { en: 'Contact', id: 'Kontak'  } },
+  '/feedback':  { icon: (s) => <MessageSquare size={s} />, label: { en: 'Feedback', id: 'Ulasan' } },
 }
 
 const MainLayout = ({ children }: Props) => {
@@ -390,6 +391,9 @@ const MainLayout = ({ children }: Props) => {
           </Link>
           <Link to="/contact" className={getNavLinkClass("/contact")} title={language === "en" ? "Contact" : "Kontak"}>
             <Mail size={16} />
+          </Link>
+          <Link to="/feedback" className={getNavLinkClass("/feedback")} title={language === "en" ? "Feedback" : "Ulasan"}>
+            <MessageSquare size={16} />
           </Link>
         </div>
 

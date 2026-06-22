@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { ExternalLink, Github, Briefcase, FileText, Bot, ShoppingBag, Image, FileImage, LayoutDashboard } from "lucide-react"
+import { ExternalLink, Github, Briefcase, FileText, Bot, ShoppingBag, Image, FileImage, LayoutDashboard, Smartphone } from "lucide-react"
 import { useApp } from "../context/AppContext"
 import { useNavigate } from "react-router-dom"
 
@@ -96,6 +96,19 @@ const projectsData: ProjectType[] = [
     tech: ["React", "TypeScript", "Vite", "ShadCN UI", "FastAPI", "Qdrant"],
     githubUrl: "https://github.com/Amamiyakun02/AgentDashboard",
     icon: LayoutDashboard,
+    featured: true
+  },
+  {
+    id: 7,
+    title: "Vienna Assistant Mobile",
+    description: {
+      en: "A native Android mobile application for Vienna AI Assistant. Designed with modern fluid UI, it integrates directly with the main AI backend to provide conversational RAG capabilities, and seamless access to personal knowledge bases directly from your smartphone.",
+      id: "Aplikasi seluler Android native untuk Asisten AI Vienna. Dirancang dengan UI modern dan responsif, berintegrasi langsung dengan backend AI utama untuk menyediakan fitur chat cerdas berbasis RAG, serta akses cepat ke knowledge base pribadi langsung dari genggaman Anda."
+    },
+    category: "Mobile",
+    tech: ["Kotlin", "Jetpack Compose", "Android SDK", "Coroutines", "Retrofit"],
+    githubUrl: "https://github.com/Amamiyakun02/AssistantMobile",
+    icon: Smartphone,
     featured: true
   }
 ]
